@@ -63,6 +63,10 @@ class ChunkedData<T> implements Sink<T> {
       f();
     }
 
+    if (buffering != 0) {
+      throw StateError('On closing, an incomplete buffering was detected');
+    }
+
     if (buffer.isNotEmpty) {
       buffer = [];
     }

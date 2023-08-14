@@ -26,6 +26,7 @@ import 'package:parser_combinator/parser/skip_while.dart';
 import 'package:parser_combinator/parser/skip_while1.dart';
 import 'package:parser_combinator/parser/tag.dart';
 import 'package:parser_combinator/parser/tags.dart';
+import 'package:parser_combinator/parser/take_while.dart';
 import 'package:parser_combinator/parser/tuple.dart';
 import 'package:parser_combinator/parser_combinator.dart';
 import 'package:parser_combinator/parsing.dart';
@@ -55,10 +56,12 @@ void main() async {
   _testSeparatedList1();
   _testSeparatedListMN();
   _testSeparatedPair();
-  _testSkipWhile();
-  _testSkipWhile1();
+  _testSkipWhile(); // OK
+  _testSkipWhile1(); //OK
   _testTag(); //OK
   _testTags();
+  _testTakeWhile(); //OK
+  //_testTakeWhile1(); //OK
 }
 
 const _bufferSize = 4;
@@ -1455,114 +1458,112 @@ void _testSeparatedPair() {
 }
 
 void _testSkipWhile() {
-  test('SkipWhile', () {
+  test('SkipWhile', () async {
+    {
+      final p = SkipWhile(isDigit);
+      const source = '0';
+      const pos = 1;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = SkipWhile(isDigit);
+      const source = '01';
+      const pos = 2;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = SkipWhile(isDigit);
+      const source = '01a';
+      const pos = 2;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = SkipWhile(isDigit);
+      const source = '';
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = SkipWhile(isDigit);
+      const source = 'a';
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
     {
       final p = SkipWhile((c) => c == 128512);
       const source = '😀';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '');
-      expect(r2.result, true);
-      expect(r1.pos, 2);
-      expect(r2.pos, 2);
+      const pos = 2;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = SkipWhile((c) => c == 128512 || c == 0x30);
       const source = '😀12';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '');
-      expect(r2.result, true);
-      expect(r1.pos, 2);
-      expect(r2.pos, 2);
+      const pos = 2;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
-      final p = SkipWhile(isAlpha);
-      const source = '';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '');
-      expect(r2.result, true);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-    }
-
-    {
-      final p = SkipWhile(isAlpha);
-      const source = '123';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '');
-      expect(r2.result, true);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
+      final p = SkipWhile((c) => c == 128512 || c == 0x30);
+      const source = '0😀1';
+      const pos = 3;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
   });
 }
 
 void _testSkipWhile1() {
-  test('SkipWhile1', () {
+  test('SkipWhile1', () async {
     {
       final p = SkipWhile1((c) => c == 128512);
       const source = '😀1';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '');
-      expect(r2.result, true);
-      expect(r1.pos, 2);
-      expect(r2.pos, 2);
+      const pos = 2;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = SkipWhile1((c) => c == 128512 || c == 0x30);
+      const source = '0😀1';
+      const pos = 3;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = SkipWhile1((c) => c == 128512);
       const source = '';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, false);
-      expect(r2.result, false);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(_errorsToSet(r1), {
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
         ErrorUnexpectedEndOfInput.message,
-      });
-      expect(_errorsToSet(r2), {
-        ErrorUnexpectedEndOfInput.message,
-      });
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
 
     {
       final p = SkipWhile1(isAlpha);
       const source = '123';
       final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, false);
-      expect(r2.result, false);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(_errorsToSet(r1), {
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
         _errorUnexpectedCharacter(input, 0),
-      });
-      expect(_errorsToSet(r2), {
-        _errorUnexpectedCharacter(input, 0),
-      });
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
   });
 }
@@ -1702,6 +1703,50 @@ void _testTags() {
       expect(_errorsToSet(r2), {
         _errorExpectedTags(['abc', 'def']),
       });
+    }
+  });
+}
+
+void _testTakeWhile() {
+  test('TakeWhile', () async {
+    {
+      final p = TakeWhile(isDigit);
+      const source = '0';
+      const pos = 1;
+      const result = '0';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = TakeWhile(isDigit);
+      const source = '01';
+      const pos = 2;
+      const result = '01';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = TakeWhile(isDigit);
+      const source = '01a';
+      const pos = 2;
+      const result = '01';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = TakeWhile(isDigit);
+      const source = '';
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = TakeWhile(isDigit);
+      const source = 'a';
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
   });
 }
