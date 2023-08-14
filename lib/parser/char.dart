@@ -1,7 +1,6 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
-import '../string_reader.dart';
 
 class Char extends Parser<StringReader, int> {
   final int char;

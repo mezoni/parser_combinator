@@ -1,7 +1,6 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
-import '../string_reader.dart';
 
 class Digit1 extends Parser<StringReader, String> {
   const Digit1({String? name}) : super(name);

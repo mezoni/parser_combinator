@@ -10,12 +10,16 @@ import 'package:parser_combinator/parser/char.dart';
 import 'package:parser_combinator/parser/choice.dart';
 import 'package:parser_combinator/parser/digit.dart';
 import 'package:parser_combinator/parser/digit1.dart';
+import 'package:parser_combinator/parser/eof.dart';
+import 'package:parser_combinator/parser/expected.dart';
 import 'package:parser_combinator/parser/has_match.dart';
 import 'package:parser_combinator/parser/integer.dart';
+import 'package:parser_combinator/parser/malformed.dart';
 import 'package:parser_combinator/parser/many.dart';
 import 'package:parser_combinator/parser/many1.dart';
 import 'package:parser_combinator/parser/many_till.dart';
 import 'package:parser_combinator/parser/match.dart';
+import 'package:parser_combinator/parser/not.dart';
 import 'package:parser_combinator/parser/predicate.dart';
 import 'package:parser_combinator/parser/replace_all.dart';
 import 'package:parser_combinator/parser/satisfy.dart';
@@ -34,7 +38,6 @@ import 'package:parser_combinator/parser_combinator.dart';
 import 'package:parser_combinator/parsing.dart';
 import 'package:parser_combinator/runtime.dart';
 import 'package:parser_combinator/streaming.dart';
-import 'package:parser_combinator/string_reader.dart';
 import 'package:test/test.dart' hide Tags;
 
 void main() async {
@@ -47,11 +50,14 @@ void main() async {
   _testChar(); //OK
   _testDigit(); // OK
   _testDigit1(); // OK
+  _testEof(); // OK
+  _testExpected(); // OK
   _testHasMatch();
   _testInteger();
+  _testMalformed(); // OK
   _testMany(); // OK
   _testMany1(); // OK
-  _testManyTill();
+  _testManyTill(); // OK
   _testMatch1();
   _testReplaceAll();
   _testSatisfy(); // OK
@@ -512,6 +518,95 @@ void _testDigit1() {
   });
 }
 
+void _testEof() {
+  test('Eof', () async {
+    {
+      final p = Eof();
+      const source = '';
+      const pos = 0;
+      const result = null;
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = Tuple4(Not(Eof()), Tag('1'), Not(Eof()), Tag('2'));
+      const source = '12';
+      const pos = 2;
+      const result = (null, '1', null, '2');
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = Eof();
+      const source = '1';
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        ErrorExpectedEndOfInput.message,
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+  });
+}
+
+void _testExpected() {
+  test('Expected', () async {
+    {
+      final p = Expected(Tuple3(Digit1(), Tag('.'), Digit1()), 'number');
+      const source = '1.0';
+      const pos = 3;
+      const result = ('1', '.', '0');
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = Expected(Tuple3(Digit1(), Tag('.'), Digit1()), 'number');
+      const source = '';
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        _errorExpectedTags(['number']),
+        ErrorUnexpectedEndOfInput.message,
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = Expected(Tuple3(Digit1(), Tag('.'), Digit1()), 'number');
+      const source = '1';
+      const failPos = 1;
+      const pos = 0;
+      final errors = {
+        ErrorUnexpectedEndOfInput.message,
+        _errorExpectedTags(['.']),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = Expected(Tuple3(Digit1(), Tag('.'), Digit1()), 'number');
+      const source = '1a';
+      const failPos = 1;
+      const pos = 0;
+      final errors = {
+        _errorExpectedTags(['.']),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = Expected(Tuple3(Digit1(), Tag('.'), Digit1()), 'number');
+      const source = '1.';
+      const failPos = 2;
+      const pos = 0;
+      final errors = {
+        ErrorUnexpectedEndOfInput.message,
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+  });
+}
+
 Future<void> _testFailure<O>(
   Parser<StringReader, O> p,
   String source, {
@@ -528,15 +623,15 @@ Future<void> _testFailure<O>(
   for (var i = 0; i < rs.length; i++) {
     final r = rs[i];
     if (i == 2) {
-      expect(r.result, false);
+      expect(r.result, false, reason: 'result != false');
     } else {
-      expect(r.result != null, false);
+      expect(r.result != null, false, reason: 'result != null');
     }
 
-    expect(r.pos, pos);
-    expect(r.failPos, failPos);
+    expect(r.pos, pos, reason: 'pos');
+    expect(r.failPos, failPos, reason: 'failPos');
     if (errors != null) {
-      expect(_errorsToSet(r), errors);
+      expect(_errorsToSet(r), errors, reason: 'errors');
     }
 
     if (testErrors != null) {
@@ -738,6 +833,41 @@ void _testInteger() {
   });
 }
 
+void _testMalformed() {
+  test('Malformed', () async {
+    {
+      final p = Malformed(Tuple3(Digit1(), Tag('.'), Digit1()), 'error');
+      const source = '1.0';
+      const pos = 3;
+      const result = ('1', '.', '0');
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = Malformed(Tuple3(Digit1(), Tag('.'), Digit1()), 'error');
+      const source = '';
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        ErrorUnexpectedEndOfInput.message,
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = Malformed(Tuple3(Digit1(), Tag('.'), Digit1()), 'error');
+      const source = '1';
+      const failPos = 1;
+      const pos = 0;
+      final errors = {
+        'error',
+        ErrorUnexpectedEndOfInput.message,
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+  });
+}
+
 void _testMany() {
   test('Many', () async {
     {
@@ -825,120 +955,106 @@ void _testMany1() {
 }
 
 void _testManyTill() {
-  test('ManyTill', () {
+  test('ManyTill', () async {
     {
       final p = ManyTill(Tag('abc'), Tag('end'));
       const source = 'end';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, isA<(List<String>, String)>());
-      expect(r1.result!.value.$1, <String>[]);
-      expect(r1.result!.value.$2, 'end');
-      expect(r2.result, true);
-      expect(r1.pos, 3);
-      expect(r2.pos, 3);
+      const pos = 3;
+      await _testSuccess(
+        p,
+        source,
+        pos: pos,
+        result: null,
+        testResult: (result) {
+          expect(result, isA<(List<String>, String)>());
+          final r = result as (List<String>, String);
+          expect(r.$1, <String>[]);
+          expect(r.$2, 'end');
+        },
+      );
     }
 
     {
       final p = ManyTill(Tag('abc'), Tag('end'));
       const source = 'abcend';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, isA<(List<String>, String)>());
-      expect(r1.result!.value.$1, ['abc']);
-      expect(r1.result!.value.$2, 'end');
-      expect(r2.result, true);
-      expect(r1.pos, 6);
-      expect(r2.pos, 6);
+      const pos = 6;
+      await _testSuccess(
+        p,
+        source,
+        pos: pos,
+        result: null,
+        testResult: (result) {
+          expect(result, isA<(List<String>, String)>());
+          final r = result as (List<String>, String);
+          expect(r.$1, ['abc']);
+          expect(r.$2, 'end');
+        },
+      );
     }
 
     {
       final p = ManyTill(Tag('abc'), Tag('end'));
       const source = 'abcabcend';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, isA<(List<String>, String)>());
-      expect(r1.result!.value.$1, ['abc', 'abc']);
-      expect(r1.result!.value.$2, 'end');
-      expect(r2.result, true);
-      expect(r1.pos, 9);
-      expect(r2.pos, 9);
+      const pos = 9;
+      await _testSuccess(
+        p,
+        source,
+        pos: pos,
+        result: null,
+        testResult: (result) {
+          expect(result, isA<(List<String>, String)>());
+          final r = result as (List<String>, String);
+          expect(r.$1, ['abc', 'abc']);
+          expect(r.$2, 'end');
+        },
+      );
     }
 
     {
       final p = ManyTill(Tag('abc'), Tag('end'));
       const source = '';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(_errorsToSet(r1), {
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
         _errorExpectedTags(['abc', 'end']),
         ErrorUnexpectedEndOfInput.message,
-      });
-      expect(_errorsToSet(r2), {
-        _errorExpectedTags(['abc', 'end']),
-        ErrorUnexpectedEndOfInput.message,
-      });
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
 
     {
       final p = ManyTill(Tag('abc'), Tag('end'));
       const source = '123';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(_errorsToSet(r1), {
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
         _errorExpectedTags(['abc', 'end']),
-      });
-      expect(_errorsToSet(r2), {
-        _errorExpectedTags(['abc', 'end']),
-      });
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
 
     {
       final p = ManyTill(Tag('abc'), Tag('end'));
       const source = 'abc';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.failPos, 3);
-      expect(r2.failPos, 3);
-      expect(_errorsToSet(r1), {
+      const failPos = 3;
+      const pos = 0;
+      final errors = {
         _errorExpectedTags(['abc', 'end']),
         ErrorUnexpectedEndOfInput.message,
-      });
-      expect(_errorsToSet(r2), {
-        _errorExpectedTags(['abc', 'end']),
-        ErrorUnexpectedEndOfInput.message,
-      });
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
 
     {
       final p = ManyTill(Tag('abc'), Tag('end'));
       const source = 'abcabc';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.failPos, 6);
-      expect(r2.failPos, 6);
-      expect(_errorsToSet(r1), {
+      const failPos = 6;
+      const pos = 0;
+      final errors = {
         _errorExpectedTags(['abc', 'end']),
         ErrorUnexpectedEndOfInput.message,
-      });
-      expect(_errorsToSet(r2), {
-        _errorExpectedTags(['abc', 'end']),
-        ErrorUnexpectedEndOfInput.message,
-      });
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
   });
 }
@@ -1530,17 +1646,17 @@ Future<void> _testSuccess<O>(
   for (var i = 0; i < rs.length; i++) {
     final r = rs[i];
     if (i == 2) {
-      expect(r.result, true);
+      expect(r.result, true, reason: 'result != true');
     } else {
-      expect(r.result != null, true);
+      expect(r.result != null, true, reason: 'result == null');
       if (testResult != null) {
         testResult((r.result as Result).value);
       } else {
-        expect((r.result as Result).value, result);
+        expect((r.result as Result).value, result, reason: 'result.value');
       }
     }
 
-    expect(r.pos, pos);
+    expect(r.pos, pos, reason: 'pos');
   }
 }
 

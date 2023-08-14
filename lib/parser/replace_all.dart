@@ -1,6 +1,5 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
-import '../string_reader.dart';
 
 class ReplaceAll<O> extends Parser<StringReader, String> {
   final String Function(String) f;

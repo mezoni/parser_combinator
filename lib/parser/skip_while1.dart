@@ -1,7 +1,6 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
-import '../string_reader.dart';
 
 class SkipWhile1 extends Parser<StringReader, String> {
   final Predicate<int> f;

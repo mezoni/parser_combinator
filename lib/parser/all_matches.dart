@@ -1,6 +1,5 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
-import '../string_reader.dart';
 
 class AllMatches
     extends Parser<StringReader, List<({int start, int end, String value})>> {

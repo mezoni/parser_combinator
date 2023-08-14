@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:parser_combinator/extra/csv_parser.dart' as csv;
 import 'package:parser_combinator/parsing.dart';
+import 'package:parser_combinator/runtime.dart';
+import 'package:parser_combinator/streaming.dart';
 import 'package:test/test.dart';
 
 import '../tool/csv_parser_generated.dart' as csv_generated;
@@ -16,48 +20,66 @@ List<List<String>> _parse(bool mode, String source) {
   }
 }
 
+Future<Object?> _parseAsync(String source) async {
+  final completer = Completer<Object?>();
+  final input = ChunkedData<StringReader>();
+  final state = State(input);
+  csv.parser.parseAsync(state, completer.complete);
+  for (final element in source.runes) {
+    input.add(StringReader(String.fromCharCode(element)));
+  }
+
+  input.close();
+  return completer.future;
+}
+
 void _test() {
   for (final mode in [false, true]) {
-    test('CSV parser', () {
+    test('CSV parser', () async {
       {
         const s = '''
 123''';
-        final r = _parse(mode, s);
-        expect(r, [
+        final r1 = _parse(mode, s);
+        expect(r1, [
           ['123']
         ]);
       }
+
       {
         const s = '''
 123
 ''';
-        final r = _parse(mode, s);
-        expect(r, [
+        final r1 = _parse(mode, s);
+        expect(r1, [
           ['123']
         ]);
       }
+
       {
         const s = '''
 123
 456
 ''';
-        final r = _parse(mode, s);
-        expect(r, [
+        final r1 = _parse(mode, s);
+
+        expect(r1, [
           ['123'],
           ['456']
         ]);
       }
+
       {
         const s = '''
 123,"abc😄"
 456,def😄
 ''';
-        final r = _parse(mode, s);
-        expect(r, [
+        final r1 = _parse(mode, s);
+        expect(r1, [
           ['123', 'abc😄'],
           ['456', 'def😄']
         ]);
       }
+
       {
         const s = '''
 123,"""abc😄"""
@@ -69,6 +91,7 @@ void _test() {
           ['456', 'def😄']
         ]);
       }
+
       {
         const s = '''
 123,"ab""c😄"""
@@ -80,6 +103,7 @@ void _test() {
           ['456', 'def😄']
         ]);
       }
+
       {
         const s = '''
 123,abc😄,1
@@ -91,6 +115,7 @@ void _test() {
           ['456', 'def😄', '']
         ]);
       }
+
       {
         const s = '''
 123,"multi
@@ -103,6 +128,7 @@ line",1
           ['456', 'def😄', '']
         ]);
       }
+
       {
         const s = '''
 123,abc😄

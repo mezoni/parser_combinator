@@ -1,6 +1,5 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
-import '../string_reader.dart';
 
 class Tags extends Parser<StringReader, String> {
   final List<String> tags;

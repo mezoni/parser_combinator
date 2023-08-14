@@ -2,7 +2,6 @@ import 'package:parser_combinator/extra/json_parser.dart' as json_parser;
 import 'package:parser_combinator/parser_combinator.dart';
 import 'package:parser_combinator/parsing.dart';
 import 'package:parser_combinator/runtime.dart';
-import 'package:parser_combinator/string_reader.dart';
 import 'package:parser_combinator/tracing.dart';
 
 void main(List<String> args) {

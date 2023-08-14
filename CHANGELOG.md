@@ -1,3 +1,7 @@
+## 0.2.4
+
+- Fixed bugs.
+
 ## 0.2.3
 
 - Fixed bugs.

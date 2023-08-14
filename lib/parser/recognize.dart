@@ -1,6 +1,5 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
-import '../string_reader.dart';
 
 class Recognize<O> extends Parser<StringReader, String> {
   final Parser<StringReader, O> p;

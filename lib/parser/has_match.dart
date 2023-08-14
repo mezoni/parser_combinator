@@ -1,6 +1,5 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
-import '../string_reader.dart';
 
 class HasMatch<O>
     extends Parser<StringReader, ({int start, int end, String value})> {

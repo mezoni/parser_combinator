@@ -1,6 +1,5 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
-import '../string_reader.dart';
 
 class Rest extends Parser<StringReader, String> {
   const Rest({String? name}) : super(name);

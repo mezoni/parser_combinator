@@ -2,7 +2,6 @@ import 'package:intl/intl.dart';
 
 import 'runtime.dart';
 import 'streaming.dart';
-import 'string_reader.dart';
 
 ParseResult<I, R> createParseResult<I, O, R>(
   State<I> state,

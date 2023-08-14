@@ -25,7 +25,6 @@ import '../parser/value.dart';
 import '../parser_combinator.dart';
 import '../parsing.dart';
 import '../runtime.dart';
-import '../string_reader.dart';
 
 void main(List<String> args) {
   const source = '{"rocket": "🚀 flies to the stars"}';

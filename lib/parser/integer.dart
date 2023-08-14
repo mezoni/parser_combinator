@@ -1,6 +1,5 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
-import '../string_reader.dart';
 
 class Integer extends Parser<StringReader, String> {
   const Integer({String? name}) : super(name);

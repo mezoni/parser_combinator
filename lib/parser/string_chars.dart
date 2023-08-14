@@ -1,6 +1,5 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
-import '../string_reader.dart';
 
 class StringChars extends Parser<StringReader, String> {
   final bool Function(int) isNormalChar;

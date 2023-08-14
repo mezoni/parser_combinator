@@ -1,6 +1,5 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
-import '../string_reader.dart';
 
 class TakeWhileMN extends Parser<StringReader, String> {
   final Predicate<int> f;
