@@ -41,16 +41,16 @@ class Breakpoints {
 }
 
 class TracerBuilder<I> {
-  final bool Function<O>(Parser<I, O> parser, State<I> state) _fastParse;
+  final bool Function<O>(Parser<I, O> parser, State<I> state)? _fastParse;
 
   final bool Function<O>(Parser<I, O> parser)? _filter;
 
-  final Result<O>? Function<O>(Parser<I, O> parser, State<I> state) _parse;
+  final Result<O>? Function<O>(Parser<I, O> parser, State<I> state)? _parse;
 
   const TracerBuilder({
-    required bool Function<O>(Parser<I, O> parser, State<I> state) fastParse,
+    bool Function<O>(Parser<I, O> parser, State<I> state)? fastParse,
     bool Function<O>(Parser<I, O> parser)? filter,
-    required Result<O>? Function<O>(Parser<I, O> parser, State<I> state) parse,
+    Result<O>? Function<O>(Parser<I, O> parser, State<I> state)? parse,
   })  : _fastParse = fastParse,
         _filter = filter,
         _parse = parse;
@@ -74,9 +74,9 @@ class TracerBuilder<I> {
 }
 
 class _Tracer<I, O> extends Parser<I, O> {
-  final bool Function<O>(Parser<I, O> parser, State<I> state) _fastParse;
+  final bool Function<O>(Parser<I, O> parser, State<I> state)? _fastParse;
 
-  final Result<O>? Function<O>(Parser<I, O> parser, State<I> state) _parse;
+  final Result<O>? Function<O>(Parser<I, O> parser, State<I> state)? _parse;
 
   final Parser<I, O> parser;
 
@@ -89,12 +89,20 @@ class _Tracer<I, O> extends Parser<I, O> {
 
   @override
   bool fastParse(State<I> state) {
-    return _fastParse(parser, state);
+    if (_fastParse != null) {
+      return _fastParse!(parser, state);
+    } else {
+      return parser.fastParse(state);
+    }
   }
 
   @override
   Result<O>? parse(State<I> state) {
-    return _parse(parser, state);
+    if (_parse != null) {
+      return _parse!(parser, state);
+    } else {
+      return parser.parse(state);
+    }
   }
 
   @override

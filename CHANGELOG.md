@@ -1,3 +1,7 @@
+## 0.2.5
+
+- Minor changes in the JSON parser.
+
 ## 0.2.4
 
 - Fixed bugs.

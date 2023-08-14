@@ -455,7 +455,7 @@ Result<String>? _hexValueChecked(State<StringReader> state) {
   }
 
   if (state.canHandleError(failPos, errorCount)) {
-    if (state.pos != failPos) {
+    if (state.pos != state.failPos) {
       state.clearErrors(failPos, errorCount);
       state.failAt<Object?>(
           state.failPos, ErrorMessage(state.pos - state.failPos, message));

@@ -33,7 +33,7 @@ void main(List<String> args) {
   print(result);
 }
 
-const parser = Delimited(name: 'parser', _ws, _valueRef, Eof());
+const parser = Delimited(name: 'parser', _ws, _value, Eof());
 
 const _array = Delimited(name: '_array', _openBracket, _values, _closeBracket);
 
@@ -71,9 +71,7 @@ const _hexValueChecked = Malformed(
 const _integer = Integer(name: '_integer');
 
 const _keyValue = Map1(
-    name: '_keyValue',
-    SeparatedPair(_string, _colon, _valueRef),
-    createMapEntry);
+    name: '_keyValue', SeparatedPair(_string, _colon, _value), createMapEntry);
 
 const _keyValues = SeparatedList(name: '_keyValues', _keyValue, _comma);
 
@@ -123,7 +121,10 @@ const _string = Expected(
 
 const _true = ValueP(name: '_true', true, Terminated(Tag('true'), _ws));
 
-const _value = Choice7(
+const Parser<StringReader, Object?> _value =
+    Ref(name: '_value_', getValueParser);
+
+const _value_ = Choice7(
   name: '_value',
   _object,
   _array,
@@ -134,10 +135,7 @@ const _value = Choice7(
   _true,
 );
 
-const Parser<StringReader, Object?> _valueRef =
-    Ref(name: '_valueRef', getValueParser);
-
-const _values = SeparatedList(name: '_values', _valueRef, _comma);
+const _values = SeparatedList(name: '_values', _value, _comma);
 
 const _ws = SkipWhile(name: '_ws', isWhitespace);
 
@@ -149,7 +147,7 @@ String createStringFromHexValue(String s) {
   return String.fromCharCode(toHexValue(s));
 }
 
-Parser<StringReader, Object?> getValueParser() => _value;
+Parser<StringReader, Object?> getValueParser() => _value_;
 
 bool isNormalChar(int c) => c <= 91
     ? c <= 33
