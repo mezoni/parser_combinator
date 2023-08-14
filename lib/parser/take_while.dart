@@ -52,7 +52,7 @@ class TakeWhile extends Parser<StringReader, String> {
     final input = state.input;
     final buffer = input.buffer;
     final index0 = input.index0;
-    final index2 = input.index2;
+    final index1 = input.index1;
     final pos = state.pos;
     final charCodes = <int>[];
     input.buffering++;
@@ -60,7 +60,7 @@ class TakeWhile extends Parser<StringReader, String> {
       if (input.index0 < input.start) {
         input.buffering--;
         input.index0 = index0;
-        input.index2 = index2;
+        input.index1 = index1;
         state.failAt<Object?>(state.failPos, ErrorBacktrackingError(state.pos));
         state.pos = pos;
         onDone(null);
@@ -70,28 +70,32 @@ class TakeWhile extends Parser<StringReader, String> {
       var index = input.index0 - input.start;
       while (index < buffer.length) {
         final chunk = buffer[index];
-        if (input.index2 >= chunk.length) {
+        if (input.index1 >= chunk.length) {
           index++;
           input.index0++;
-          input.index2 = 0;
+          input.index1 = 0;
           continue;
         }
 
-        final c = chunk.readChar(input.index2);
+        final c = chunk.readChar(input.index1);
         if (!f(c)) {
           input.buffering--;
-          onDone(Result(String.fromCharCodes(charCodes)));
+          final value =
+              charCodes.isNotEmpty ? String.fromCharCodes(charCodes) : '';
+          onDone(Result(value));
           return true;
         }
 
         charCodes.add(c);
-        input.index2 += chunk.count;
+        input.index1 += chunk.count;
         state.pos += chunk.count;
       }
 
       if (input.isClosed) {
         input.buffering--;
-        onDone(Result(String.fromCharCodes(charCodes)));
+        final value =
+            charCodes.isNotEmpty ? String.fromCharCodes(charCodes) : '';
+        onDone(Result(value));
         return true;
       }
 

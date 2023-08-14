@@ -378,8 +378,10 @@ extension StringExt on String {
           return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
         }
       }
+
       throw FormatException('Invalid UTF-16 character', this, index - 1);
     }
+
     return w1;
   }
 }

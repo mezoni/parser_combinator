@@ -1,5 +1,6 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
+import '../streaming.dart';
 
 class SeparatedList1<I, O1, O2> extends Parser<I, List<O1>> {
   final Parser<I, O1> p;
@@ -54,5 +55,45 @@ class SeparatedList1<I, O1, O2> extends Parser<I, List<O1>> {
 
       list.add(r3.value);
     }
+  }
+
+  @override
+  void parseStream(
+      State<ChunkedData<I>> state, VoidCallback1<List<O1>> onDone) {
+    final input = state.input;
+    final list = <O1>[];
+    void parse2() {
+      void parse3() {
+        p.parseStream(state, (result) {
+          if (result == null) {
+            onDone(null);
+          } else {
+            list.add(result.value);
+            input.handle(parse2);
+          }
+        });
+      }
+
+      sep.parseStream(state, (result) {
+        if (result == null) {
+          onDone(Result(list));
+        } else {
+          input.handle(parse3);
+        }
+      });
+    }
+
+    void parse() {
+      p.parseStream(state, (result) {
+        if (result == null) {
+          onDone(null);
+        } else {
+          list.add(result.value);
+          input.handle(parse2);
+        }
+      });
+    }
+
+    parse();
   }
 }

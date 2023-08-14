@@ -49,13 +49,13 @@ class Satisfy extends Parser<StringReader, int> {
     final buffer = input.buffer;
     final pos = state.pos;
     final index0 = input.index0;
-    final index2 = input.index2;
+    final index1 = input.index1;
     input.buffering++;
     bool parse() {
       if (input.index0 < input.start) {
         input.buffering--;
         input.index0 = index0;
-        input.index2 = index2;
+        input.index1 = index1;
         state.failAt<Object?>(state.failPos, ErrorBacktrackingError(state.pos));
         state.pos = pos;
         onDone(null);
@@ -67,20 +67,20 @@ class Satisfy extends Parser<StringReader, int> {
       var index = input.index0 - input.start;
       while (index < buffer.length) {
         final chunk = buffer[index];
-        if (input.index2 >= chunk.length) {
+        if (input.index1 >= chunk.length) {
           index++;
           input.index0++;
-          input.index2 = 0;
+          input.index1 = 0;
           continue;
         }
 
-        c = chunk.readChar(input.index2);
+        c = chunk.readChar(input.index1);
         if (!f(c)) {
           ok = false;
           break;
         }
 
-        input.index2 += chunk.count;
+        input.index1 += chunk.count;
         state.pos += chunk.count;
         input.buffering--;
         onDone(Result(c));
@@ -90,7 +90,7 @@ class Satisfy extends Parser<StringReader, int> {
       if (!ok || input.isClosed) {
         input.buffering--;
         input.index0 = index0;
-        input.index2 = index2;
+        input.index1 = index1;
         state.pos = pos;
         state.fail<Object?>(ErrorUnexpectedCharacter(c));
         onDone(null);

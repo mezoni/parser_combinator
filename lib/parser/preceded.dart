@@ -50,14 +50,14 @@ class Preceded<I, O1, O2> extends Parser<I, O2> {
   void parseStream(State<ChunkedData<I>> state, VoidCallback1<O2> onDone) {
     final input = state.input;
     final index0 = input.index0;
-    final index2 = input.index2;
+    final index1 = input.index1;
     final pos = state.pos;
     void parse2() {
       p.parseStream(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           onDone(result);

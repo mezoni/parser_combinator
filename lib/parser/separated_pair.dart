@@ -58,7 +58,7 @@ class SeparatedPair<I, O1, O2, O3> extends Parser<I, (O1, O3)> {
       State<ChunkedData<I>> state, VoidCallback1<(O1, O3)> onDone) {
     final input = state.input;
     final index0 = input.index0;
-    final index2 = input.index2;
+    final index1 = input.index1;
     final pos = state.pos;
     Result<O1>? r1;
     Result<O3>? r3;
@@ -67,7 +67,7 @@ class SeparatedPair<I, O1, O2, O3> extends Parser<I, (O1, O3)> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           r3 = result;
@@ -81,7 +81,7 @@ class SeparatedPair<I, O1, O2, O3> extends Parser<I, (O1, O3)> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse3);

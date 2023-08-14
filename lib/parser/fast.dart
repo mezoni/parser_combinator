@@ -53,14 +53,14 @@ class Fast2<I, O1, O2> extends Parser<I, Object?> {
   void parseStream(State<ChunkedData<I>> state, VoidCallback1<Object?> onDone) {
     final input = state.input;
     final index0 = input.index0;
-    final index2 = input.index2;
+    final index1 = input.index1;
     final pos = state.pos;
     void parse2() {
       p2.parseStream(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           onDone(Result(null));
@@ -141,14 +141,14 @@ class Fast3<I, O1, O2, O3> extends Parser<I, Object?> {
   void parseStream(State<ChunkedData<I>> state, VoidCallback1<Object?> onDone) {
     final input = state.input;
     final index0 = input.index0;
-    final index2 = input.index2;
+    final index1 = input.index1;
     final pos = state.pos;
     void parse3() {
       p3.parseStream(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           onDone(Result(null));
@@ -161,7 +161,7 @@ class Fast3<I, O1, O2, O3> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse3);
@@ -251,14 +251,14 @@ class Fast4<I, O1, O2, O3, O4> extends Parser<I, Object?> {
   void parseStream(State<ChunkedData<I>> state, VoidCallback1<Object?> onDone) {
     final input = state.input;
     final index0 = input.index0;
-    final index2 = input.index2;
+    final index1 = input.index1;
     final pos = state.pos;
     void parse4() {
       p4.parseStream(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           onDone(Result(null));
@@ -271,7 +271,7 @@ class Fast4<I, O1, O2, O3, O4> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse4);
@@ -284,7 +284,7 @@ class Fast4<I, O1, O2, O3, O4> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse3);
@@ -384,14 +384,14 @@ class Fast5<I, O1, O2, O3, O4, O5> extends Parser<I, Object?> {
   void parseStream(State<ChunkedData<I>> state, VoidCallback1<Object?> onDone) {
     final input = state.input;
     final index0 = input.index0;
-    final index2 = input.index2;
+    final index1 = input.index1;
     final pos = state.pos;
     void parse5() {
       p5.parseStream(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           onDone(Result(null));
@@ -404,7 +404,7 @@ class Fast5<I, O1, O2, O3, O4, O5> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse5);
@@ -417,7 +417,7 @@ class Fast5<I, O1, O2, O3, O4, O5> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse4);
@@ -430,7 +430,7 @@ class Fast5<I, O1, O2, O3, O4, O5> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse3);
@@ -540,14 +540,14 @@ class Fast6<I, O1, O2, O3, O4, O5, O6> extends Parser<I, Object?> {
   void parseStream(State<ChunkedData<I>> state, VoidCallback1<Object?> onDone) {
     final input = state.input;
     final index0 = input.index0;
-    final index2 = input.index2;
+    final index1 = input.index1;
     final pos = state.pos;
     void parse6() {
       p6.parseStream(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           onDone(Result(null));
@@ -560,7 +560,7 @@ class Fast6<I, O1, O2, O3, O4, O5, O6> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse6);
@@ -573,7 +573,7 @@ class Fast6<I, O1, O2, O3, O4, O5, O6> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse5);
@@ -586,7 +586,7 @@ class Fast6<I, O1, O2, O3, O4, O5, O6> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse4);
@@ -599,7 +599,7 @@ class Fast6<I, O1, O2, O3, O4, O5, O6> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse3);
@@ -718,14 +718,14 @@ class Fast7<I, O1, O2, O3, O4, O5, O6, O7> extends Parser<I, Object?> {
   void parseStream(State<ChunkedData<I>> state, VoidCallback1<Object?> onDone) {
     final input = state.input;
     final index0 = input.index0;
-    final index2 = input.index2;
+    final index1 = input.index1;
     final pos = state.pos;
     void parse7() {
       p7.parseStream(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           onDone(Result(null));
@@ -738,7 +738,7 @@ class Fast7<I, O1, O2, O3, O4, O5, O6, O7> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse7);
@@ -751,7 +751,7 @@ class Fast7<I, O1, O2, O3, O4, O5, O6, O7> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse6);
@@ -764,7 +764,7 @@ class Fast7<I, O1, O2, O3, O4, O5, O6, O7> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse5);
@@ -777,7 +777,7 @@ class Fast7<I, O1, O2, O3, O4, O5, O6, O7> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse4);
@@ -790,7 +790,7 @@ class Fast7<I, O1, O2, O3, O4, O5, O6, O7> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse3);
@@ -919,14 +919,14 @@ class Fast8<I, O1, O2, O3, O4, O5, O6, O7, O8> extends Parser<I, Object?> {
   void parseStream(State<ChunkedData<I>> state, VoidCallback1<Object?> onDone) {
     final input = state.input;
     final index0 = input.index0;
-    final index2 = input.index2;
+    final index1 = input.index1;
     final pos = state.pos;
     void parse8() {
       p8.parseStream(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           onDone(Result(null));
@@ -939,7 +939,7 @@ class Fast8<I, O1, O2, O3, O4, O5, O6, O7, O8> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse8);
@@ -952,7 +952,7 @@ class Fast8<I, O1, O2, O3, O4, O5, O6, O7, O8> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse7);
@@ -965,7 +965,7 @@ class Fast8<I, O1, O2, O3, O4, O5, O6, O7, O8> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse6);
@@ -978,7 +978,7 @@ class Fast8<I, O1, O2, O3, O4, O5, O6, O7, O8> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse5);
@@ -991,7 +991,7 @@ class Fast8<I, O1, O2, O3, O4, O5, O6, O7, O8> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse4);
@@ -1004,7 +1004,7 @@ class Fast8<I, O1, O2, O3, O4, O5, O6, O7, O8> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse3);
@@ -1142,14 +1142,14 @@ class Fast9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9> extends Parser<I, Object?> {
   void parseStream(State<ChunkedData<I>> state, VoidCallback1<Object?> onDone) {
     final input = state.input;
     final index0 = input.index0;
-    final index2 = input.index2;
+    final index1 = input.index1;
     final pos = state.pos;
     void parse9() {
       p9.parseStream(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           onDone(Result(null));
@@ -1162,7 +1162,7 @@ class Fast9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse9);
@@ -1175,7 +1175,7 @@ class Fast9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse8);
@@ -1188,7 +1188,7 @@ class Fast9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse7);
@@ -1201,7 +1201,7 @@ class Fast9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse6);
@@ -1214,7 +1214,7 @@ class Fast9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse5);
@@ -1227,7 +1227,7 @@ class Fast9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse4);
@@ -1240,7 +1240,7 @@ class Fast9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9> extends Parser<I, Object?> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index2 = index2;
+          input.index1 = index1;
           onDone(null);
         } else {
           input.handle(parse3);

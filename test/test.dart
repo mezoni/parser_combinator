@@ -4,6 +4,7 @@ import 'package:parser_combinator/parser/all_matches.dart';
 import 'package:parser_combinator/parser/alpha.dart';
 import 'package:parser_combinator/parser/alpha1.dart';
 import 'package:parser_combinator/parser/and.dart';
+import 'package:parser_combinator/parser/any_char.dart';
 import 'package:parser_combinator/parser/buffered.dart';
 import 'package:parser_combinator/parser/char.dart';
 import 'package:parser_combinator/parser/choice.dart';
@@ -27,6 +28,7 @@ import 'package:parser_combinator/parser/skip_while1.dart';
 import 'package:parser_combinator/parser/tag.dart';
 import 'package:parser_combinator/parser/tags.dart';
 import 'package:parser_combinator/parser/take_while.dart';
+import 'package:parser_combinator/parser/take_while1.dart';
 import 'package:parser_combinator/parser/tuple.dart';
 import 'package:parser_combinator/parser_combinator.dart';
 import 'package:parser_combinator/parsing.dart';
@@ -37,12 +39,13 @@ import 'package:test/test.dart' hide Tags;
 
 void main() async {
   _testAllMatches();
-  _testAlpha();
+  _testAlpha(); // OK
   _testAlpha1();
   _testAnd(); // OK
+  _testAnyChar(); // OK
   _testBuffered(); // OK
   _testChar(); //OK
-  _testDigit();
+  _testDigit(); // OK
   _testDigit1();
   _testHasMatch();
   _testInteger();
@@ -52,16 +55,16 @@ void main() async {
   _testMatch1();
   _testReplaceAll();
   _testSatisfy(); // OK
-  _testSeparatedList();
-  _testSeparatedList1();
+  _testSeparatedList(); // OK
+  _testSeparatedList1(); // OK
   _testSeparatedListMN();
-  _testSeparatedPair();
+  _testSeparatedPair(); // OK
   _testSkipWhile(); // OK
   _testSkipWhile1(); //OK
   _testTag(); //OK
   _testTags();
   _testTakeWhile(); //OK
-  //_testTakeWhile1(); //OK
+  _testTakeWhile1(); //OK
 }
 
 const _bufferSize = 4;
@@ -194,57 +197,37 @@ void _testAllMatches() {
 }
 
 void _testAlpha() {
-  test('Alpha', () {
+  test('Alpha', () async {
     {
       final p = Alpha();
       const source = 'a';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, 'a');
-      expect(r2.result, true);
-      expect(r1.pos, 1);
-      expect(r2.pos, 1);
+      const pos = 1;
+      const result = 'a';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = Alpha();
       const source = 'abc';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, 'abc');
-      expect(r2.result, true);
-      expect(r1.pos, 3);
-      expect(r2.pos, 3);
+      const pos = 3;
+      const result = 'abc';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = Alpha();
       const source = '';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '');
-      expect(r2.result, true);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = Alpha();
       const source = '1';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '');
-      expect(r2.result, true);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
   });
 }
@@ -328,6 +311,38 @@ void _testAnd() {
       const pos = 0;
       final errors = {
         _errorExpectedTags(['~']),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+  });
+}
+
+void _testAnyChar() {
+  test('AnyChar', () async {
+    {
+      final p = AnyChar();
+      const source = '0😀';
+      const pos = 1;
+      const result = 0x30;
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = Char(128512);
+      const source = '😀0';
+      const pos = 2;
+      const result = 128512;
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = Char(0x30);
+      const source = '';
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        ErrorUnexpectedEndOfInput.message,
+        _errorExpectedCharacter(0x30)
       };
       await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
@@ -438,57 +453,37 @@ void _testChar() {
 }
 
 void _testDigit() {
-  test('Digit', () {
+  test('Digit', () async {
     {
       final p = Digit();
       const source = '1';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '1');
-      expect(r2.result, true);
-      expect(r1.pos, 1);
-      expect(r2.pos, 1);
+      const pos = 1;
+      const result = '1';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = Digit();
       const source = '123';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '123');
-      expect(r2.result, true);
-      expect(r1.pos, 3);
-      expect(r2.pos, 3);
+      const pos = 3;
+      const result = '123';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = Digit();
       const source = '';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '');
-      expect(r2.result, true);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = Digit();
       const source = 'a';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '');
-      expect(r2.result, true);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
   });
 }
@@ -1198,96 +1193,77 @@ void _testSatisfy() {
 }
 
 void _testSeparatedList() {
-  test('SeparatedList', () {
+  test('SeparatedList', () async {
     {
       final p = SeparatedList(Tag('123'), Tag('.'));
       const source = '123';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, ['123']);
-      expect(r2.result, true);
-      expect(r1.pos, 3);
-      expect(r2.pos, 3);
+      const pos = 3;
+      const result = ['123'];
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = SeparatedList(Tag('123'), Tag('.'));
       const source = '123.123';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, ['123', '123']);
-      expect(r2.result, true);
-      expect(r1.pos, 7);
-      expect(r2.pos, 7);
+      const pos = 7;
+      const result = ['123', '123'];
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = SeparatedList(Tag('123'), Tag('.'));
+      const source = '123.123.123';
+      const pos = 11;
+      const result = ['123', '123', '123'];
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = SeparatedList(Tag('123'), Tag('.'));
       const source = '';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, <String>[]);
-      expect(r2.result, true);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
+      const pos = 0;
+      const result = <String>[];
+      await _testSuccess(p, source, pos: pos, result: result);
     }
   });
 }
 
 void _testSeparatedList1() {
-  test('SeparatedList1', () {
+  test('SeparatedList1', () async {
     {
       final p = SeparatedList1(Tag('123'), Tag('.'));
       const source = '123';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, ['123']);
-      expect(r2.result, true);
-      expect(r1.pos, 3);
-      expect(r2.pos, 3);
+      const pos = 3;
+      const result = ['123'];
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = SeparatedList1(Tag('123'), Tag('.'));
       const source = '123.123';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, ['123', '123']);
-      expect(r2.result, true);
-      expect(r1.pos, 7);
-      expect(r2.pos, 7);
+      const pos = 7;
+      const result = ['123', '123'];
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = SeparatedList1(Tag('123'), Tag('.'));
+      const source = '123.123.123';
+      const pos = 11;
+      const result = ['123', '123', '123'];
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = SeparatedList1(Tag('123'), Tag('.'));
       const source = '';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, false);
-      expect(r2.result, false);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(_errorsToSet(r1), {
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
         _errorExpectedTags(['123']),
         ErrorUnexpectedEndOfInput.message,
-      });
-      expect(_errorsToSet(r2), {
-        _errorExpectedTags(['123']),
-        ErrorUnexpectedEndOfInput.message,
-      });
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
   });
 }
@@ -1419,40 +1395,49 @@ void _testSeparatedListMN() {
 }
 
 void _testSeparatedPair() {
-  test('SeparatedPair', () {
+  test('SeparatedPair', () async {
     {
       final p = SeparatedPair(Tag('1'), Tag('2'), Tag('3'));
       const source = '123';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, ('1', '3'));
-      expect(r2.result, true);
-      expect(r1.pos, 3);
-      expect(r2.pos, 3);
+      const pos = 3;
+      const result = ('1', '3');
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = SeparatedPair(Tag('1'), Tag('2'), Tag('3'));
       const source = '';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, false);
-      expect(r2.result, false);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(_errorsToSet(r1), {
-        _errorExpectedTags(['1']),
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
         ErrorUnexpectedEndOfInput.message,
-      });
-      expect(_errorsToSet(r2), {
-        _errorExpectedTags(['1']),
+        _errorExpectedTags(['1'])
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = SeparatedPair(Tag('1'), Tag('2'), Tag('3'));
+      const source = '1';
+      const failPos = 1;
+      const pos = 0;
+      final errors = {
         ErrorUnexpectedEndOfInput.message,
-      });
+        _errorExpectedTags(['2'])
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = SeparatedPair(Tag('1'), Tag('2'), Tag('3'));
+      const source = '12';
+      const failPos = 2;
+      const pos = 0;
+      final errors = {
+        ErrorUnexpectedEndOfInput.message,
+        _errorExpectedTags(['3'])
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
   });
 }
@@ -1747,6 +1732,57 @@ void _testTakeWhile() {
       const pos = 0;
       const result = '';
       await _testSuccess(p, source, pos: pos, result: result);
+    }
+  });
+}
+
+void _testTakeWhile1() {
+  test('TakeWhile1', () async {
+    {
+      final p = TakeWhile1((c) => c == 128512 || c == 0x30);
+      const source = '0😀1';
+      const pos = 3;
+      const result = '0😀';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = TakeWhile1((c) => c == 128512);
+      const source = '😀1';
+      const pos = 2;
+      const result = '😀';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = TakeWhile1((c) => c == 128512 || c == 0x30);
+      const source = '0😀1';
+      const pos = 3;
+      const result = '0😀';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = TakeWhile1((c) => c == 128512);
+      const source = '';
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        ErrorUnexpectedEndOfInput.message,
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = TakeWhile1(isAlpha);
+      const source = '123';
+      final input = StringReader(source);
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        _errorUnexpectedCharacter(input, 0),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
   });
 }
