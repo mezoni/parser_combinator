@@ -55,14 +55,12 @@ class Char extends Parser<StringReader, int> {
     final buffer = input.buffer;
     final pos = state.pos;
     final index0 = input.index0;
-    final index1 = input.index1;
     final index2 = input.index2;
     input.buffering++;
     bool parse() {
       if (input.index0 < input.start) {
         input.buffering--;
         input.index0 = index0;
-        input.index1 = index1;
         input.index2 = index2;
         state.failAt<Object?>(state.failPos, ErrorBacktrackingError(state.pos));
         state.pos = pos;
@@ -71,11 +69,12 @@ class Char extends Parser<StringReader, int> {
       }
 
       var ok = true;
-      while (input.index1 < buffer.length) {
-        final chunk = buffer[input.index1];
+      var index = input.index0 - input.start;
+      while (index < buffer.length) {
+        final chunk = buffer[index];
         if (input.index2 >= chunk.length) {
+          index++;
           input.index0++;
-          input.index1++;
           input.index2 = 0;
           continue;
         }
@@ -96,7 +95,6 @@ class Char extends Parser<StringReader, int> {
       if (!ok || input.isClosed) {
         input.buffering--;
         input.index0 = index0;
-        input.index1 = index1;
         input.index2 = index2;
         state.pos = pos;
         state.fail<Object?>(ErrorExpectedCharacter(char));

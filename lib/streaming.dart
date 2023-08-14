@@ -11,8 +11,6 @@ class ChunkedData<T> implements Sink<T> {
 
   int index0 = 0;
 
-  int index1 = 0;
-
   int index2 = 0;
 
   int start = 0;

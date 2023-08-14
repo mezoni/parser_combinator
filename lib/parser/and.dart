@@ -40,7 +40,6 @@ class And<I, O1> extends Parser<I, Object?> {
   void parseStream(State<ChunkedData<I>> state, VoidCallback1<Object?> onDone) {
     final input = state.input;
     final index0 = input.index0;
-    final index1 = input.index1;
     final index2 = input.index2;
     final pos = state.pos;
     void parse() {
@@ -50,7 +49,6 @@ class And<I, O1> extends Parser<I, Object?> {
         } else {
           state.pos = pos;
           input.index0 = index0;
-          input.index1 = index1;
           input.index2 = index2;
           onDone(Result(null));
         }

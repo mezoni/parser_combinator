@@ -50,7 +50,6 @@ class Terminated<I, O1, O2> extends Parser<I, O1> {
   void parseStream(State<ChunkedData<I>> state, VoidCallback1<O1> onDone) {
     final input = state.input;
     final index0 = input.index0;
-    final index1 = input.index1;
     final index2 = input.index2;
     final pos = state.pos;
     Result<O1>? r1;
@@ -59,7 +58,6 @@ class Terminated<I, O1, O2> extends Parser<I, O1> {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
-          input.index1 = index1;
           input.index2 = index2;
           onDone(null);
         } else {

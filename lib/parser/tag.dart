@@ -44,7 +44,6 @@ class Tag extends Parser<StringReader, String> {
     final input = state.input;
     final buffer = input.buffer;
     final index0 = input.index0;
-    final index1 = input.index1;
     final index2 = input.index2;
     final pos = state.pos;
     var count = 0;
@@ -53,7 +52,6 @@ class Tag extends Parser<StringReader, String> {
       if (input.index0 < input.start) {
         input.buffering--;
         input.index0 = index0;
-        input.index1 = index1;
         input.index2 = index2;
         state.failAt<Object?>(state.failPos, ErrorBacktrackingError(state.pos));
         state.pos = pos;
@@ -62,11 +60,12 @@ class Tag extends Parser<StringReader, String> {
       }
 
       var ok = true;
-      while (input.index1 < buffer.length) {
-        final chunk = buffer[input.index1];
+      var index = input.index0 - input.start;
+      while (index < buffer.length) {
+        final chunk = buffer[index];
         if (input.index2 >= chunk.length) {
+          index++;
           input.index0++;
-          input.index1++;
           input.index2 = 0;
           continue;
         }
@@ -90,7 +89,6 @@ class Tag extends Parser<StringReader, String> {
       if (!ok || input.isClosed) {
         input.buffering--;
         input.index0 = index0;
-        input.index1 = index1;
         input.index2 = index2;
         state.pos = pos;
         state.fail<Object?>(ErrorExpectedTag(tag));
