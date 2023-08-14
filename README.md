@@ -2,7 +2,7 @@
 
 Parser combinator is a collection of parsers that can be used to combine basic parsers to create parsers for more complex rules.
 
-Version: 0.2.4
+Version: 0.2.5
 
 ## About
 
