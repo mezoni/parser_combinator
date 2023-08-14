@@ -25,11 +25,6 @@ class ChunkedData<T> implements Sink<T> {
       throw StateError('Chunked data sink already closed');
     }
 
-    if (buffering == 0) {
-      start += buffer.length;
-      buffer = [];
-    }
-
     buffer.add(data);
     if (listener != null) {
       final f = listener!;
@@ -39,15 +34,14 @@ class ChunkedData<T> implements Sink<T> {
     }
 
     while (handler != null) {
-      if (buffering == 0 && buffer.isNotEmpty && index1 > 0) {
-        buffer.removeRange(0, index1);
-        start += index1;
-        index1 = 0;
-      }
-
       final f = handler!;
       handler = null;
       f();
+    }
+
+    if (buffering == 0) {
+      start += buffer.length;
+      buffer = [];
     }
   }
 
@@ -69,6 +63,10 @@ class ChunkedData<T> implements Sink<T> {
       final f = handler!;
       handler = null;
       f();
+    }
+
+    if (buffer.isNotEmpty) {
+      buffer = [];
     }
   }
 

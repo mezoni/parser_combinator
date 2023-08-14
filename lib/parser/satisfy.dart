@@ -54,7 +54,14 @@ class Satisfy extends Parser<StringReader, int> {
     input.buffering++;
     bool parse() {
       if (input.index0 < input.start) {
-        throw UnimplementedError();
+        input.buffering--;
+        input.index0 = index0;
+        input.index1 = index1;
+        input.index2 = index2;
+        state.failAt<Object?>(state.failPos, ErrorBacktrackingError(state.pos));
+        state.pos = pos;
+        onDone(null);
+        return true;
       }
 
       var ok = true;

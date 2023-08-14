@@ -11,8 +11,8 @@ class ErrorBacktrackingError extends ParseError {
 
   @override
   ErrorMessage getErrorMessage(Object? input, int? offset) {
-    // TODO: implement getErrorMessage
-    throw UnimplementedError();
+    final argument = '$position';
+    return ErrorMessage(0, ErrorBacktrackingError.message, [argument]);
   }
 }
 
