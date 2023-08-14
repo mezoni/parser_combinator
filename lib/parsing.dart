@@ -255,8 +255,8 @@ List<ErrorMessage> _localize<I>(
         locale: locale,
       );
       final newTags = element2.tags.map((e) => tags[e] ?? e).toList();
-      message = ErrorExpectedTags(newTags)
-          .getLocalizedErrorMessage(input, offset, text);
+      message = ErrorExpectedTags(newTags).getErrorMessage(input, offset);
+      message = ErrorMessage(message.length, text, message.arguments);
     } else {
       final arguments = message.arguments;
       num howMany = 0;

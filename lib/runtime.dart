@@ -77,13 +77,7 @@ class ErrorExpectedTag extends ParseError {
 
   @override
   ErrorMessage getErrorMessage(Object? input, int? offset) {
-    return getLocalizedErrorMessage(input, offset, ErrorExpectedTag.message);
-  }
-
-  ErrorMessage getLocalizedErrorMessage(
-      Object? input, int? offset, String message) {
-    final argument = tag;
-    return ErrorMessage(0, message, [argument]);
+    return ErrorMessage(0, ErrorExpectedTag.message);
   }
 }
 
@@ -96,15 +90,10 @@ class ErrorExpectedTags extends ParseError {
 
   @override
   ErrorMessage getErrorMessage(Object? input, int? offset) {
-    return getLocalizedErrorMessage(input, offset, ErrorExpectedTags.message);
-  }
-
-  ErrorMessage getLocalizedErrorMessage(
-      Object? input, int? offset, String message) {
     final list = tags.map(ParseError.escape).toList();
     list.sort();
     final argument = list.join(', ');
-    return ErrorMessage(0, message, [argument]);
+    return ErrorMessage(0, ErrorExpectedTags.message, [argument]);
   }
 }
 
