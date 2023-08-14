@@ -20,6 +20,7 @@ List<List<String>> _parse(bool mode, String source) {
   }
 }
 
+// ignore: unused_element
 Future<Object?> _parseAsync(String source) async {
   final completer = Completer<Object?>();
   final input = ChunkedData<StringReader>();
