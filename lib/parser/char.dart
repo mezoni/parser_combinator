@@ -49,7 +49,7 @@ class Char extends Parser<StringReader, int> {
   }
 
   @override
-  void parseStream(
+  void parseAsync(
       State<ChunkedData<StringReader>> state, VoidCallback1<int> onDone) {
     final input = state.input;
     final buffer = input.buffer;

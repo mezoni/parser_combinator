@@ -54,8 +54,7 @@ class SeparatedPair<I, O1, O2, O3> extends Parser<I, (O1, O3)> {
   }
 
   @override
-  void parseStream(
-      State<ChunkedData<I>> state, VoidCallback1<(O1, O3)> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<(O1, O3)> onDone) {
     final input = state.input;
     final index0 = input.index0;
     final index1 = input.index1;
@@ -63,7 +62,7 @@ class SeparatedPair<I, O1, O2, O3> extends Parser<I, (O1, O3)> {
     Result<O1>? r1;
     Result<O3>? r3;
     void parse3() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -77,7 +76,7 @@ class SeparatedPair<I, O1, O2, O3> extends Parser<I, (O1, O3)> {
     }
 
     void parse2() {
-      sep.parseStream(state, (result) {
+      sep.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -90,7 +89,7 @@ class SeparatedPair<I, O1, O2, O3> extends Parser<I, (O1, O3)> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {

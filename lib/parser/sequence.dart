@@ -31,9 +31,9 @@ class Sequence1<I, O> extends Parser<I, List<O>> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
     void parse() {
-      p.parseStream(state, (result) {
+      p.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {
@@ -93,7 +93,7 @@ class Sequence2<I, O> extends Parser<I, List<O>> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
     final input = state.input;
     final index0 = input.index0;
     final index1 = input.index1;
@@ -101,7 +101,7 @@ class Sequence2<I, O> extends Parser<I, List<O>> {
     Result<O>? r1;
     Result<O>? r2;
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -118,7 +118,7 @@ class Sequence2<I, O> extends Parser<I, List<O>> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {
@@ -188,7 +188,7 @@ class Sequence3<I, O> extends Parser<I, List<O>> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
     final input = state.input;
     final index0 = input.index0;
     final index1 = input.index1;
@@ -197,7 +197,7 @@ class Sequence3<I, O> extends Parser<I, List<O>> {
     Result<O>? r2;
     Result<O>? r3;
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -215,7 +215,7 @@ class Sequence3<I, O> extends Parser<I, List<O>> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -229,7 +229,7 @@ class Sequence3<I, O> extends Parser<I, List<O>> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {
@@ -309,7 +309,7 @@ class Sequence4<I, O> extends Parser<I, List<O>> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
     final input = state.input;
     final index0 = input.index0;
     final index1 = input.index1;
@@ -319,7 +319,7 @@ class Sequence4<I, O> extends Parser<I, List<O>> {
     Result<O>? r3;
     Result<O>? r4;
     void parse4() {
-      p4.parseStream(state, (result) {
+      p4.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -338,7 +338,7 @@ class Sequence4<I, O> extends Parser<I, List<O>> {
     }
 
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -352,7 +352,7 @@ class Sequence4<I, O> extends Parser<I, List<O>> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -366,7 +366,7 @@ class Sequence4<I, O> extends Parser<I, List<O>> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {
@@ -455,7 +455,7 @@ class Sequence5<I, O> extends Parser<I, List<O>> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
     final input = state.input;
     final index0 = input.index0;
     final index1 = input.index1;
@@ -466,7 +466,7 @@ class Sequence5<I, O> extends Parser<I, List<O>> {
     Result<O>? r4;
     Result<O>? r5;
     void parse5() {
-      p5.parseStream(state, (result) {
+      p5.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -486,7 +486,7 @@ class Sequence5<I, O> extends Parser<I, List<O>> {
     }
 
     void parse4() {
-      p4.parseStream(state, (result) {
+      p4.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -500,7 +500,7 @@ class Sequence5<I, O> extends Parser<I, List<O>> {
     }
 
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -514,7 +514,7 @@ class Sequence5<I, O> extends Parser<I, List<O>> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -528,7 +528,7 @@ class Sequence5<I, O> extends Parser<I, List<O>> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {
@@ -634,7 +634,7 @@ class Sequence6<I, O> extends Parser<I, List<O>> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
     final input = state.input;
     final index0 = input.index0;
     final index1 = input.index1;
@@ -646,7 +646,7 @@ class Sequence6<I, O> extends Parser<I, List<O>> {
     Result<O>? r5;
     Result<O>? r6;
     void parse6() {
-      p6.parseStream(state, (result) {
+      p6.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -667,7 +667,7 @@ class Sequence6<I, O> extends Parser<I, List<O>> {
     }
 
     void parse5() {
-      p5.parseStream(state, (result) {
+      p5.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -681,7 +681,7 @@ class Sequence6<I, O> extends Parser<I, List<O>> {
     }
 
     void parse4() {
-      p4.parseStream(state, (result) {
+      p4.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -695,7 +695,7 @@ class Sequence6<I, O> extends Parser<I, List<O>> {
     }
 
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -709,7 +709,7 @@ class Sequence6<I, O> extends Parser<I, List<O>> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -723,7 +723,7 @@ class Sequence6<I, O> extends Parser<I, List<O>> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {
@@ -839,7 +839,7 @@ class Sequence7<I, O> extends Parser<I, List<O>> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
     final input = state.input;
     final index0 = input.index0;
     final index1 = input.index1;
@@ -852,7 +852,7 @@ class Sequence7<I, O> extends Parser<I, List<O>> {
     Result<O>? r6;
     Result<O>? r7;
     void parse7() {
-      p7.parseStream(state, (result) {
+      p7.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -874,7 +874,7 @@ class Sequence7<I, O> extends Parser<I, List<O>> {
     }
 
     void parse6() {
-      p6.parseStream(state, (result) {
+      p6.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -888,7 +888,7 @@ class Sequence7<I, O> extends Parser<I, List<O>> {
     }
 
     void parse5() {
-      p5.parseStream(state, (result) {
+      p5.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -902,7 +902,7 @@ class Sequence7<I, O> extends Parser<I, List<O>> {
     }
 
     void parse4() {
-      p4.parseStream(state, (result) {
+      p4.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -916,7 +916,7 @@ class Sequence7<I, O> extends Parser<I, List<O>> {
     }
 
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -930,7 +930,7 @@ class Sequence7<I, O> extends Parser<I, List<O>> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -944,7 +944,7 @@ class Sequence7<I, O> extends Parser<I, List<O>> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {
@@ -1071,7 +1071,7 @@ class Sequence8<I, O> extends Parser<I, List<O>> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
     final input = state.input;
     final index0 = input.index0;
     final index1 = input.index1;
@@ -1085,7 +1085,7 @@ class Sequence8<I, O> extends Parser<I, List<O>> {
     Result<O>? r7;
     Result<O>? r8;
     void parse8() {
-      p8.parseStream(state, (result) {
+      p8.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1108,7 +1108,7 @@ class Sequence8<I, O> extends Parser<I, List<O>> {
     }
 
     void parse7() {
-      p7.parseStream(state, (result) {
+      p7.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1122,7 +1122,7 @@ class Sequence8<I, O> extends Parser<I, List<O>> {
     }
 
     void parse6() {
-      p6.parseStream(state, (result) {
+      p6.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1136,7 +1136,7 @@ class Sequence8<I, O> extends Parser<I, List<O>> {
     }
 
     void parse5() {
-      p5.parseStream(state, (result) {
+      p5.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1150,7 +1150,7 @@ class Sequence8<I, O> extends Parser<I, List<O>> {
     }
 
     void parse4() {
-      p4.parseStream(state, (result) {
+      p4.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1164,7 +1164,7 @@ class Sequence8<I, O> extends Parser<I, List<O>> {
     }
 
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1178,7 +1178,7 @@ class Sequence8<I, O> extends Parser<I, List<O>> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1192,7 +1192,7 @@ class Sequence8<I, O> extends Parser<I, List<O>> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {
@@ -1329,7 +1329,7 @@ class Sequence9<I, O> extends Parser<I, List<O>> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
     final input = state.input;
     final index0 = input.index0;
     final index1 = input.index1;
@@ -1344,7 +1344,7 @@ class Sequence9<I, O> extends Parser<I, List<O>> {
     Result<O>? r8;
     Result<O>? r9;
     void parse9() {
-      p9.parseStream(state, (result) {
+      p9.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1368,7 +1368,7 @@ class Sequence9<I, O> extends Parser<I, List<O>> {
     }
 
     void parse8() {
-      p8.parseStream(state, (result) {
+      p8.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1382,7 +1382,7 @@ class Sequence9<I, O> extends Parser<I, List<O>> {
     }
 
     void parse7() {
-      p7.parseStream(state, (result) {
+      p7.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1396,7 +1396,7 @@ class Sequence9<I, O> extends Parser<I, List<O>> {
     }
 
     void parse6() {
-      p6.parseStream(state, (result) {
+      p6.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1410,7 +1410,7 @@ class Sequence9<I, O> extends Parser<I, List<O>> {
     }
 
     void parse5() {
-      p5.parseStream(state, (result) {
+      p5.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1424,7 +1424,7 @@ class Sequence9<I, O> extends Parser<I, List<O>> {
     }
 
     void parse4() {
-      p4.parseStream(state, (result) {
+      p4.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1438,7 +1438,7 @@ class Sequence9<I, O> extends Parser<I, List<O>> {
     }
 
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1452,7 +1452,7 @@ class Sequence9<I, O> extends Parser<I, List<O>> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -1466,7 +1466,7 @@ class Sequence9<I, O> extends Parser<I, List<O>> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {

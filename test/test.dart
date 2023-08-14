@@ -40,13 +40,13 @@ import 'package:test/test.dart' hide Tags;
 void main() async {
   _testAllMatches();
   _testAlpha(); // OK
-  _testAlpha1();
+  _testAlpha1(); // OK
   _testAnd(); // OK
   _testAnyChar(); // OK
   _testBuffered(); // OK
   _testChar(); //OK
   _testDigit(); // OK
-  _testDigit1();
+  _testDigit1(); // OK
   _testHasMatch();
   _testInteger();
   _testMany(); // OK
@@ -100,7 +100,7 @@ Future<ParseResult<ChunkedData<StringReader>, Result<O>?>> _parseStream<O>(
   final completer =
       Completer<ParseResult<ChunkedData<StringReader>, Result<O>?>>();
   final state = State(input);
-  p.parseStream(state, (result) {
+  p.parseAsync(state, (result) {
     final r = createParseResult<ChunkedData<StringReader>, O, Result<O>?>(
       state,
       result,
@@ -233,63 +233,44 @@ void _testAlpha() {
 }
 
 void _testAlpha1() {
-  test('Alpha1', () {
+  test('Alpha1', () async {
     {
       final p = Alpha1();
       const source = 'a';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, 'a');
-      expect(r2.result, true);
-      expect(r1.pos, 1);
-      expect(r2.pos, 1);
+      const pos = 1;
+      const result = 'a';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = Alpha1();
       const source = 'abc';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, 'abc');
-      expect(r2.result, true);
-      expect(r1.pos, 3);
-      expect(r2.pos, 3);
+      const pos = 3;
+      const result = 'abc';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = Alpha1();
       const source = '';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, false);
-      expect(r2.result, false);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(_errorsToSet(r1), {ErrorUnexpectedEndOfInput.message});
-      expect(_errorsToSet(r2), {ErrorUnexpectedEndOfInput.message});
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        ErrorUnexpectedEndOfInput.message,
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
 
     {
       final p = Alpha1();
       const source = '1';
       final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, false);
-      expect(r2.result, false);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(_errorsToSet(r1), {_errorUnexpectedCharacter(input, 0)});
-      expect(_errorsToSet(r2), {_errorUnexpectedCharacter(input, 0)});
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        _errorUnexpectedCharacter(input, 0),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
   });
 }
@@ -489,63 +470,44 @@ void _testDigit() {
 }
 
 void _testDigit1() {
-  test('Digit1', () {
+  test('Digit1', () async {
     {
       final p = Digit1();
       const source = '1';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '1');
-      expect(r2.result, true);
-      expect(r1.pos, 1);
-      expect(r2.pos, 1);
+      const pos = 1;
+      const result = '1';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = Digit1();
       const source = '123';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '123');
-      expect(r2.result, true);
-      expect(r1.pos, 3);
-      expect(r2.pos, 3);
+      const pos = 3;
+      const result = '123';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = Digit1();
       const source = '';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, false);
-      expect(r2.result, false);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(r1.errors[0].toString(), ErrorUnexpectedEndOfInput.message);
-      expect(r2.errors[0].toString(), ErrorUnexpectedEndOfInput.message);
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        ErrorUnexpectedEndOfInput.message,
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
 
     {
       final p = Digit1();
       const source = 'a';
       final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, false);
-      expect(r2.result, false);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(r1.errors[0].toString(), _errorUnexpectedCharacter(input, 0));
-      expect(r2.errors[0].toString(), _errorUnexpectedCharacter(input, 0));
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        _errorUnexpectedCharacter(input, 0),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
   });
 }

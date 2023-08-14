@@ -49,16 +49,16 @@ class Choice2<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
     final input = state.input;
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         onDone(result);
       });
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse2);
         } else {
@@ -131,16 +131,16 @@ class Choice3<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
     final input = state.input;
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         onDone(result);
       });
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse3);
         } else {
@@ -150,7 +150,7 @@ class Choice3<I, O> extends Parser<I, O> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse2);
         } else {
@@ -237,16 +237,16 @@ class Choice4<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
     final input = state.input;
     void parse4() {
-      p4.parseStream(state, (result) {
+      p4.parseAsync(state, (result) {
         onDone(result);
       });
     }
 
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse4);
         } else {
@@ -256,7 +256,7 @@ class Choice4<I, O> extends Parser<I, O> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse3);
         } else {
@@ -266,7 +266,7 @@ class Choice4<I, O> extends Parser<I, O> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse2);
         } else {
@@ -366,16 +366,16 @@ class Choice5<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
     final input = state.input;
     void parse5() {
-      p5.parseStream(state, (result) {
+      p5.parseAsync(state, (result) {
         onDone(result);
       });
     }
 
     void parse4() {
-      p4.parseStream(state, (result) {
+      p4.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse5);
         } else {
@@ -385,7 +385,7 @@ class Choice5<I, O> extends Parser<I, O> {
     }
 
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse4);
         } else {
@@ -395,7 +395,7 @@ class Choice5<I, O> extends Parser<I, O> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse3);
         } else {
@@ -405,7 +405,7 @@ class Choice5<I, O> extends Parser<I, O> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse2);
         } else {
@@ -519,16 +519,16 @@ class Choice6<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
     final input = state.input;
     void parse6() {
-      p6.parseStream(state, (result) {
+      p6.parseAsync(state, (result) {
         onDone(result);
       });
     }
 
     void parse5() {
-      p5.parseStream(state, (result) {
+      p5.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse6);
         } else {
@@ -538,7 +538,7 @@ class Choice6<I, O> extends Parser<I, O> {
     }
 
     void parse4() {
-      p4.parseStream(state, (result) {
+      p4.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse5);
         } else {
@@ -548,7 +548,7 @@ class Choice6<I, O> extends Parser<I, O> {
     }
 
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse4);
         } else {
@@ -558,7 +558,7 @@ class Choice6<I, O> extends Parser<I, O> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse3);
         } else {
@@ -568,7 +568,7 @@ class Choice6<I, O> extends Parser<I, O> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse2);
         } else {
@@ -695,16 +695,16 @@ class Choice7<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
     final input = state.input;
     void parse7() {
-      p7.parseStream(state, (result) {
+      p7.parseAsync(state, (result) {
         onDone(result);
       });
     }
 
     void parse6() {
-      p6.parseStream(state, (result) {
+      p6.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse7);
         } else {
@@ -714,7 +714,7 @@ class Choice7<I, O> extends Parser<I, O> {
     }
 
     void parse5() {
-      p5.parseStream(state, (result) {
+      p5.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse6);
         } else {
@@ -724,7 +724,7 @@ class Choice7<I, O> extends Parser<I, O> {
     }
 
     void parse4() {
-      p4.parseStream(state, (result) {
+      p4.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse5);
         } else {
@@ -734,7 +734,7 @@ class Choice7<I, O> extends Parser<I, O> {
     }
 
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse4);
         } else {
@@ -744,7 +744,7 @@ class Choice7<I, O> extends Parser<I, O> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse3);
         } else {
@@ -754,7 +754,7 @@ class Choice7<I, O> extends Parser<I, O> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse2);
         } else {
@@ -895,16 +895,16 @@ class Choice8<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
     final input = state.input;
     void parse8() {
-      p8.parseStream(state, (result) {
+      p8.parseAsync(state, (result) {
         onDone(result);
       });
     }
 
     void parse7() {
-      p7.parseStream(state, (result) {
+      p7.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse8);
         } else {
@@ -914,7 +914,7 @@ class Choice8<I, O> extends Parser<I, O> {
     }
 
     void parse6() {
-      p6.parseStream(state, (result) {
+      p6.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse7);
         } else {
@@ -924,7 +924,7 @@ class Choice8<I, O> extends Parser<I, O> {
     }
 
     void parse5() {
-      p5.parseStream(state, (result) {
+      p5.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse6);
         } else {
@@ -934,7 +934,7 @@ class Choice8<I, O> extends Parser<I, O> {
     }
 
     void parse4() {
-      p4.parseStream(state, (result) {
+      p4.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse5);
         } else {
@@ -944,7 +944,7 @@ class Choice8<I, O> extends Parser<I, O> {
     }
 
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse4);
         } else {
@@ -954,7 +954,7 @@ class Choice8<I, O> extends Parser<I, O> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse3);
         } else {
@@ -964,7 +964,7 @@ class Choice8<I, O> extends Parser<I, O> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse2);
         } else {
@@ -1118,16 +1118,16 @@ class Choice9<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
     final input = state.input;
     void parse9() {
-      p9.parseStream(state, (result) {
+      p9.parseAsync(state, (result) {
         onDone(result);
       });
     }
 
     void parse8() {
-      p8.parseStream(state, (result) {
+      p8.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse9);
         } else {
@@ -1137,7 +1137,7 @@ class Choice9<I, O> extends Parser<I, O> {
     }
 
     void parse7() {
-      p7.parseStream(state, (result) {
+      p7.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse8);
         } else {
@@ -1147,7 +1147,7 @@ class Choice9<I, O> extends Parser<I, O> {
     }
 
     void parse6() {
-      p6.parseStream(state, (result) {
+      p6.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse7);
         } else {
@@ -1157,7 +1157,7 @@ class Choice9<I, O> extends Parser<I, O> {
     }
 
     void parse5() {
-      p5.parseStream(state, (result) {
+      p5.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse6);
         } else {
@@ -1167,7 +1167,7 @@ class Choice9<I, O> extends Parser<I, O> {
     }
 
     void parse4() {
-      p4.parseStream(state, (result) {
+      p4.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse5);
         } else {
@@ -1177,7 +1177,7 @@ class Choice9<I, O> extends Parser<I, O> {
     }
 
     void parse3() {
-      p3.parseStream(state, (result) {
+      p3.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse4);
         } else {
@@ -1187,7 +1187,7 @@ class Choice9<I, O> extends Parser<I, O> {
     }
 
     void parse2() {
-      p2.parseStream(state, (result) {
+      p2.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse3);
         } else {
@@ -1197,7 +1197,7 @@ class Choice9<I, O> extends Parser<I, O> {
     }
 
     void parse() {
-      p1.parseStream(state, (result) {
+      p1.parseAsync(state, (result) {
         if (result == null) {
           input.handle(parse2);
         } else {

@@ -39,7 +39,7 @@ class Tag extends Parser<StringReader, String> {
   }
 
   @override
-  void parseStream(
+  void parseAsync(
       State<ChunkedData<StringReader>> state, VoidCallback1<String> onDone) {
     final input = state.input;
     final buffer = input.buffer;

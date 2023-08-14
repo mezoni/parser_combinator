@@ -58,13 +58,12 @@ class SeparatedList1<I, O1, O2> extends Parser<I, List<O1>> {
   }
 
   @override
-  void parseStream(
-      State<ChunkedData<I>> state, VoidCallback1<List<O1>> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O1>> onDone) {
     final input = state.input;
     final list = <O1>[];
     void parse2() {
       void parse3() {
-        p.parseStream(state, (result) {
+        p.parseAsync(state, (result) {
           if (result == null) {
             onDone(null);
           } else {
@@ -74,7 +73,7 @@ class SeparatedList1<I, O1, O2> extends Parser<I, List<O1>> {
         });
       }
 
-      sep.parseStream(state, (result) {
+      sep.parseAsync(state, (result) {
         if (result == null) {
           onDone(Result(list));
         } else {
@@ -84,7 +83,7 @@ class SeparatedList1<I, O1, O2> extends Parser<I, List<O1>> {
     }
 
     void parse() {
-      p.parseStream(state, (result) {
+      p.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {

@@ -1,7 +1,6 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:parser_combinator/extra/csv_parser.dart' as _i0;
 import 'package:parser_combinator/runtime.dart';
-import 'package:parser_combinator/string_reader.dart';
 
 bool _eof(State<StringReader> state) {
   if (state.pos >= state.input.length) {
@@ -20,6 +19,7 @@ bool _not0(State<StringReader> state) {
   }
 
   state.pos = pos;
+  state.fail<Object?>(ErrorUnexpectedInput(pos - state.pos));
   return false;
 }
 

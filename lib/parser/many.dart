@@ -48,11 +48,11 @@ class Many<I, O> extends Parser<I, List<O>> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
     final input = state.input;
     final list = <O>[];
     void parse() {
-      p.parseStream(state, (result) {
+      p.parseAsync(state, (result) {
         if (result == null) {
           onDone(Result(list));
         } else {

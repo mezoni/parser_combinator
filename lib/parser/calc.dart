@@ -25,7 +25,7 @@ class Calc<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
     final v = f();
     onDone(Result(v));
   }

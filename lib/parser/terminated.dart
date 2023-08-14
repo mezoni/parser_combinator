@@ -47,14 +47,14 @@ class Terminated<I, O1, O2> extends Parser<I, O1> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<O1> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O1> onDone) {
     final input = state.input;
     final index0 = input.index0;
     final index1 = input.index1;
     final pos = state.pos;
     Result<O1>? r1;
     void parse2() {
-      end.parseStream(state, (result) {
+      end.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
           input.index0 = index0;
@@ -67,7 +67,7 @@ class Terminated<I, O1, O2> extends Parser<I, O1> {
     }
 
     void parse() {
-      p.parseStream(state, (result) {
+      p.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {

@@ -23,7 +23,7 @@ abstract class Parser<I, O> {
 
   Result<O>? parse(State<I> state);
 
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
     throw UnimplementedError();
   }
 

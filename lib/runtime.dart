@@ -1,4 +1,5 @@
 import 'string_reader.dart';
+export 'string_reader.dart';
 
 typedef ErrorHandler = (bool, ParseError?) Function(int pos, int failPos);
 

@@ -98,7 +98,7 @@ class _Tracer<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseStream(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
-    return parseStream(state, onDone);
+  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+    return parseAsync(state, onDone);
   }
 }

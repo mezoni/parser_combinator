@@ -2,7 +2,6 @@
 import 'package:parser_combinator/extra/json_parser.dart' as _i1;
 import 'package:parser_combinator/parser/predicate.dart' as _i0;
 import 'package:parser_combinator/runtime.dart';
-import 'package:parser_combinator/string_reader.dart';
 
 bool _ws(State<StringReader> state) {
   const f = _i0.isWhitespace;
