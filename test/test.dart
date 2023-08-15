@@ -1673,6 +1673,14 @@ void _testTag() {
     }
 
     {
+      final p = Tag('');
+      const source = '0';
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
       final p = Tag('abc');
       const source = '';
       const failPos = 0;

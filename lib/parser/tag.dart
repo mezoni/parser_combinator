@@ -59,7 +59,7 @@ class _AsyncTagParser extends ChunkedDataParser<String> {
 
   @override
   bool? parseChar(int c) {
-    if (count > tag.length) {
+    if (count >= tag.length) {
       return false;
     }
 
@@ -73,5 +73,15 @@ class _AsyncTagParser extends ChunkedDataParser<String> {
     }
 
     return null;
+  }
+
+  @override
+  bool? parseError() {
+    if (tag.isEmpty) {
+      result = const Result('');
+      return true;
+    }
+
+    return false;
   }
 }

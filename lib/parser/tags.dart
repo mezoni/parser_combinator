@@ -1,5 +1,6 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
+import '../streaming.dart';
 
 class Tags extends Parser<StringReader, String> {
   final List<String> tags;
@@ -38,5 +39,50 @@ class Tags extends Parser<StringReader, String> {
     }
 
     return state.fail(ErrorExpectedTags(tags));
+  }
+}
+
+class _AsyncTagsParser extends ChunkedDataParser<String> {
+  int count = 0;
+
+  int count2 = 0;
+
+  final List<String> tags;
+
+  _AsyncTagsParser(this.tags);
+
+  @override
+  void onError(State<ChunkedData<StringReader>> state) {
+    state.fail<Object?>(ErrorExpectedTags(tags));
+  }
+
+  @override
+  bool? parseChar(int c) {
+    if (count2 >= tags.length) {
+      return false;
+    }
+
+    final tag = tags[count2];
+    if (c != tag.runeAt(count++)) {
+      return false;
+    }
+
+    if (count == tag.length) {
+      result = Result(tag);
+      return true;
+    }
+
+    return null;
+  }
+
+  @override
+  bool? parseError() {
+    if (count2 >= tags.length) {
+      return false;
+    }
+
+    count2++;
+    count = 0;
+    return null;
   }
 }

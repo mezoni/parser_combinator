@@ -42,8 +42,8 @@ abstract class ChunkedDataParser<O> {
         }
 
         c = chunk.readChar(input.index);
-        final cont = parseChar(c);
-        if (cont == false) {
+        final r = parseChar(c);
+        if (r == false) {
           ok = false;
           break;
         }
@@ -51,7 +51,7 @@ abstract class ChunkedDataParser<O> {
         input.index += chunk.count;
         state.pos += chunk.count;
         input.trackCount(state.pos);
-        if (cont == true) {
+        if (r == true) {
           input.buffering--;
           onDone(result!);
           return true;
@@ -59,14 +59,19 @@ abstract class ChunkedDataParser<O> {
       }
 
       if (!ok || input.isClosed) {
-        if (parseError()) {
+        final r = parseError();
+        if (r == true) {
           input.buffering--;
           onDone(result!);
           return true;
+        } else if (r == null) {
+          input.position = position;
+          input.index = index;
+          state.pos = pos;
+          input.listen(parse);
+          return false;
         }
-      }
 
-      if (!ok || input.isClosed) {
         input.buffering--;
         input.position = position;
         input.index = index;
@@ -85,7 +90,7 @@ abstract class ChunkedDataParser<O> {
 
   bool? parseChar(int c);
 
-  bool parseError() {
+  bool? parseError() {
     return false;
   }
 }
