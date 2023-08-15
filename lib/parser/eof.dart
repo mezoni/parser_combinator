@@ -32,53 +32,28 @@ class Eof extends Parser<StringReader, Object?> {
   @override
   void parseAsync(
       State<ChunkedData<StringReader>> state, VoidCallback1<Object?> onDone) {
-    final input = state.input;
-    final buffer = input.buffer;
-    final position = input.position;
-    final index = input.index;
-    final pos = state.pos;
-    input.buffering++;
-    bool parse() {
-      var i = input.position - input.start;
-      if (i < 0) {
-        input.buffering--;
-        input.position = position;
-        input.index = index;
-        state.failAt<Object?>(state.failPos, ErrorBacktrackingError(state.pos));
-        onDone(null);
-        return true;
-      }
+    final p = _AsyncEofParser();
+    p.parseAsync(state, onDone);
+  }
+}
 
-      while (i < buffer.length) {
-        final chunk = buffer[i];
-        if (input.index >= chunk.length) {
-          i++;
-          input.position++;
-          input.index = 0;
-          continue;
-        }
+class _AsyncEofParser extends ChunkedDataParser<Object?> {
+  var eof = true;
 
-        input.buffering--;
-        input.position = position;
-        input.index = index;
-        state.pos = pos;
-        state.fail<Object?>(const ErrorExpectedEndOfInput());
-        onDone(null);
-        return true;
-      }
+  @override
+  void onError(State<ChunkedData<StringReader>> state) {
+    state.fail<Object?>(const ErrorExpectedEndOfInput());
+  }
 
-      if (input.isClosed) {
-        input.buffering--;
-        input.position = position;
-        input.index = index;
-        onDone(Result(null));
-        return true;
-      }
+  @override
+  bool? parseChar(int c) {
+    eof = false;
+    return false;
+  }
 
-      input.listen(parse);
-      return false;
-    }
-
-    parse();
+  @override
+  bool parseError() {
+    result = Result(null);
+    return eof;
   }
 }

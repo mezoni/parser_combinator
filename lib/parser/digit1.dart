@@ -52,67 +52,40 @@ class Digit1 extends Parser<StringReader, String> {
   @override
   void parseAsync(
       State<ChunkedData<StringReader>> state, VoidCallback1<String> onDone) {
-    final input = state.input;
-    final buffer = input.buffer;
-    final position = input.position;
-    final index = input.index;
-    final pos = state.pos;
-    final charCodes = <int>[];
-    input.buffering++;
-    bool parse() {
-      var i = input.position - input.start;
-      if (i < 0) {
-        input.buffering--;
-        input.position = position;
-        input.index = index;
-        state.failAt<Object?>(state.failPos, ErrorBacktrackingError(state.pos));
-        state.pos = pos;
-        onDone(null);
-        return true;
-      }
+    final p = _AsyncAlpha1Parser();
+    p.parseAsync(state, onDone);
+  }
+}
 
-      int? c;
-      var ok = true;
-      while (i < buffer.length) {
-        final chunk = buffer[i];
-        if (input.index >= chunk.length) {
-          i++;
-          input.position++;
-          input.index = 0;
-          continue;
-        }
+class _AsyncAlpha1Parser extends ChunkedDataParser<String> {
+  final List<int> charCodes = [];
 
-        c = chunk.readChar(input.index);
-        if (!(c >= 0x30 && c <= 0x39)) {
-          ok = false;
-          break;
-        }
+  int? c;
 
-        charCodes.add(c);
-        input.index += chunk.count;
-        state.pos += chunk.count;
-      }
+  @override
+  void onError(State<ChunkedData<StringReader>> state) {
+    state.fail<Object?>(ErrorUnexpectedCharacter(c));
+  }
 
-      if (!ok || input.isClosed) {
-        input.buffering--;
-        if (charCodes.isNotEmpty) {
-          onDone(Result(String.fromCharCodes(charCodes)));
-          return true;
-        } else {
-          input.position = position;
-          input.index = index;
-          state.pos = pos;
-          state.fail<Object?>(ErrorUnexpectedCharacter(c));
-          onDone(null);
-        }
+  @override
+  bool? parseChar(int c) {
+    if (c >= 0x30 && c <= 0x39) {
+      charCodes.add(c);
+      return null;
+    }
 
-        return true;
-      }
+    this.c = c;
+    return false;
+  }
 
-      input.listen(parse);
+  @override
+  bool parseError() {
+    if (charCodes.isEmpty) {
       return false;
     }
 
-    parse();
+    final value = String.fromCharCodes(charCodes);
+    result = Result(value);
+    return true;
   }
 }

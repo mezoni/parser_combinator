@@ -1695,6 +1695,28 @@ void _testTag() {
       };
       await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
+
+    {
+      final p = Tag('abc');
+      const source = 'a';
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        _errorExpectedTags(['abc']),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = Tag('abc');
+      const source = 'ab';
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        _errorExpectedTags(['abc']),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
   });
 }
 

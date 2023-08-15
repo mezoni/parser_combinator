@@ -44,62 +44,31 @@ class Satisfy extends Parser<StringReader, int> {
   @override
   void parseAsync(
       State<ChunkedData<StringReader>> state, VoidCallback1<int> onDone) {
-    final input = state.input;
-    final buffer = input.buffer;
-    final pos = state.pos;
-    final position = input.position;
-    final index = input.index;
-    input.buffering++;
-    bool parse() {
-      var i = input.position - input.start;
-      if (i < 0) {
-        input.buffering--;
-        input.position = position;
-        input.index = index;
-        state.failAt<Object?>(state.failPos, ErrorBacktrackingError(state.pos));
-        state.pos = pos;
-        onDone(null);
-        return true;
-      }
+    final p = _AsyncSatisfyParser(f);
+    p.parseAsync(state, onDone);
+  }
+}
 
-      int? c;
-      var ok = true;
-      while (i < buffer.length) {
-        final chunk = buffer[i];
-        if (input.index >= chunk.length) {
-          i++;
-          input.position++;
-          input.index = 0;
-          continue;
-        }
+class _AsyncSatisfyParser extends ChunkedDataParser<int> {
+  int? c;
 
-        c = chunk.readChar(input.index);
-        if (!f(c)) {
-          ok = false;
-          break;
-        }
+  final Predicate<int> f;
 
-        input.index += chunk.count;
-        state.pos += chunk.count;
-        input.buffering--;
-        onDone(Result(c));
-        return true;
-      }
+  _AsyncSatisfyParser(this.f);
 
-      if (!ok || input.isClosed) {
-        input.buffering--;
-        input.position = position;
-        input.index = index;
-        state.pos = pos;
-        state.fail<Object?>(ErrorUnexpectedCharacter(c));
-        onDone(null);
-        return true;
-      }
+  @override
+  void onError(State<ChunkedData<StringReader>> state) {
+    state.fail<Object?>(ErrorUnexpectedCharacter(c));
+  }
 
-      input.listen(parse);
-      return false;
+  @override
+  bool? parseChar(int c) {
+    if (f(c)) {
+      result = Result(c);
+      return true;
     }
 
-    parse();
+    this.c = c;
+    return false;
   }
 }

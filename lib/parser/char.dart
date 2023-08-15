@@ -50,61 +50,28 @@ class Char extends Parser<StringReader, int> {
   @override
   void parseAsync(
       State<ChunkedData<StringReader>> state, VoidCallback1<int> onDone) {
-    final input = state.input;
-    final buffer = input.buffer;
-    final pos = state.pos;
-    final position = input.position;
-    final index = input.index;
-    input.buffering++;
-    bool parse() {
-      var i = input.position - input.start;
-      if (i < 0) {
-        input.buffering--;
-        input.position = position;
-        input.index = index;
-        state.failAt<Object?>(state.failPos, ErrorBacktrackingError(state.pos));
-        state.pos = pos;
-        onDone(null);
-        return true;
-      }
+    final p = _AsyncCharParser(char);
+    p.parseAsync(state, onDone);
+  }
+}
 
-      var ok = true;
-      while (i < buffer.length) {
-        final chunk = buffer[i];
-        if (input.index >= chunk.length) {
-          i++;
-          input.position++;
-          input.index = 0;
-          continue;
-        }
+class _AsyncCharParser extends ChunkedDataParser<int> {
+  final int char;
 
-        final c = chunk.readChar(input.index);
-        if (c != char) {
-          ok = false;
-          break;
-        }
+  _AsyncCharParser(this.char);
 
-        input.index += chunk.count;
-        state.pos += chunk.count;
-        input.buffering--;
-        onDone(Result(char));
-        return true;
-      }
+  @override
+  void onError(State<ChunkedData<StringReader>> state) {
+    state.fail<Object?>(ErrorExpectedCharacter(char));
+  }
 
-      if (!ok || input.isClosed) {
-        input.buffering--;
-        input.position = position;
-        input.index = index;
-        state.pos = pos;
-        state.fail<Object?>(ErrorExpectedCharacter(char));
-        onDone(null);
-        return true;
-      }
-
-      input.listen(parse);
-      return false;
+  @override
+  bool? parseChar(int c) {
+    if (c == char) {
+      result = Result(c);
+      return true;
     }
 
-    parse();
+    return false;
   }
 }

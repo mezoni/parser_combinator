@@ -294,8 +294,7 @@ List<ParseError> _normalize<I>(I input, int offset, List<ParseError> errors) {
       result.removeWhere((e) => e is ErrorUnexpectedCharacter);
     }
   } else if (input case final ChunkedData<StringReader> input) {
-    // TODO:
-    if (input.isClosed) {
+    if (input.isClosed && offset == input.count) {
       result.add(const ErrorUnexpectedEndOfInput());
       result.removeWhere((e) => e is ErrorUnexpectedCharacter);
     }

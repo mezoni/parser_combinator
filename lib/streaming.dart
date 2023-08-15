@@ -9,6 +9,8 @@ class ChunkedData<T> implements Sink<T> {
 
   int buffering = 0;
 
+  int count = 0;
+
   int position = 0;
 
   int index = 0;
@@ -78,5 +80,11 @@ class ChunkedData<T> implements Sink<T> {
 
   void listen(bool Function()? listener) {
     this.listener = listener;
+  }
+
+  void trackCount(int count) {
+    if (this.count < count) {
+      this.count = count;
+    }
   }
 }
