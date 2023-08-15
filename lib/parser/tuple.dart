@@ -54,8 +54,8 @@ class Tuple2<I, O1, O2> extends Parser<I, (O1, O2)> {
   @override
   void parseAsync(State<ChunkedData<I>> state, VoidCallback1<(O1, O2)> onDone) {
     final input = state.input;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     final pos = state.pos;
     Result<O1>? r1;
     Result<O2>? r2;
@@ -63,8 +63,8 @@ class Tuple2<I, O1, O2> extends Parser<I, (O1, O2)> {
       p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r2 = result;
@@ -154,8 +154,8 @@ class Tuple3<I, O1, O2, O3> extends Parser<I, (O1, O2, O3)> {
   void parseAsync(
       State<ChunkedData<I>> state, VoidCallback1<(O1, O2, O3)> onDone) {
     final input = state.input;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     final pos = state.pos;
     Result<O1>? r1;
     Result<O2>? r2;
@@ -164,8 +164,8 @@ class Tuple3<I, O1, O2, O3> extends Parser<I, (O1, O2, O3)> {
       p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r3 = result;
@@ -182,8 +182,8 @@ class Tuple3<I, O1, O2, O3> extends Parser<I, (O1, O2, O3)> {
       p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r2 = result;
@@ -281,8 +281,8 @@ class Tuple4<I, O1, O2, O3, O4> extends Parser<I, (O1, O2, O3, O4)> {
   void parseAsync(
       State<ChunkedData<I>> state, VoidCallback1<(O1, O2, O3, O4)> onDone) {
     final input = state.input;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     final pos = state.pos;
     Result<O1>? r1;
     Result<O2>? r2;
@@ -292,8 +292,8 @@ class Tuple4<I, O1, O2, O3, O4> extends Parser<I, (O1, O2, O3, O4)> {
       p4.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r4 = result;
@@ -311,8 +311,8 @@ class Tuple4<I, O1, O2, O3, O4> extends Parser<I, (O1, O2, O3, O4)> {
       p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r3 = result;
@@ -325,8 +325,8 @@ class Tuple4<I, O1, O2, O3, O4> extends Parser<I, (O1, O2, O3, O4)> {
       p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r2 = result;
@@ -434,8 +434,8 @@ class Tuple5<I, O1, O2, O3, O4, O5> extends Parser<I, (O1, O2, O3, O4, O5)> {
   void parseAsync(
       State<ChunkedData<I>> state, VoidCallback1<(O1, O2, O3, O4, O5)> onDone) {
     final input = state.input;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     final pos = state.pos;
     Result<O1>? r1;
     Result<O2>? r2;
@@ -446,8 +446,8 @@ class Tuple5<I, O1, O2, O3, O4, O5> extends Parser<I, (O1, O2, O3, O4, O5)> {
       p5.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r5 = result;
@@ -466,8 +466,8 @@ class Tuple5<I, O1, O2, O3, O4, O5> extends Parser<I, (O1, O2, O3, O4, O5)> {
       p4.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r4 = result;
@@ -480,8 +480,8 @@ class Tuple5<I, O1, O2, O3, O4, O5> extends Parser<I, (O1, O2, O3, O4, O5)> {
       p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r3 = result;
@@ -494,8 +494,8 @@ class Tuple5<I, O1, O2, O3, O4, O5> extends Parser<I, (O1, O2, O3, O4, O5)> {
       p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r2 = result;
@@ -615,8 +615,8 @@ class Tuple6<I, O1, O2, O3, O4, O5, O6>
   void parseAsync(State<ChunkedData<I>> state,
       VoidCallback1<(O1, O2, O3, O4, O5, O6)> onDone) {
     final input = state.input;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     final pos = state.pos;
     Result<O1>? r1;
     Result<O2>? r2;
@@ -628,8 +628,8 @@ class Tuple6<I, O1, O2, O3, O4, O5, O6>
       p6.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r6 = result;
@@ -649,8 +649,8 @@ class Tuple6<I, O1, O2, O3, O4, O5, O6>
       p5.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r5 = result;
@@ -663,8 +663,8 @@ class Tuple6<I, O1, O2, O3, O4, O5, O6>
       p4.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r4 = result;
@@ -677,8 +677,8 @@ class Tuple6<I, O1, O2, O3, O4, O5, O6>
       p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r3 = result;
@@ -691,8 +691,8 @@ class Tuple6<I, O1, O2, O3, O4, O5, O6>
       p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r2 = result;
@@ -822,8 +822,8 @@ class Tuple7<I, O1, O2, O3, O4, O5, O6, O7>
   void parseAsync(State<ChunkedData<I>> state,
       VoidCallback1<(O1, O2, O3, O4, O5, O6, O7)> onDone) {
     final input = state.input;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     final pos = state.pos;
     Result<O1>? r1;
     Result<O2>? r2;
@@ -836,8 +836,8 @@ class Tuple7<I, O1, O2, O3, O4, O5, O6, O7>
       p7.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r7 = result;
@@ -858,8 +858,8 @@ class Tuple7<I, O1, O2, O3, O4, O5, O6, O7>
       p6.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r6 = result;
@@ -872,8 +872,8 @@ class Tuple7<I, O1, O2, O3, O4, O5, O6, O7>
       p5.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r5 = result;
@@ -886,8 +886,8 @@ class Tuple7<I, O1, O2, O3, O4, O5, O6, O7>
       p4.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r4 = result;
@@ -900,8 +900,8 @@ class Tuple7<I, O1, O2, O3, O4, O5, O6, O7>
       p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r3 = result;
@@ -914,8 +914,8 @@ class Tuple7<I, O1, O2, O3, O4, O5, O6, O7>
       p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r2 = result;
@@ -1056,8 +1056,8 @@ class Tuple8<I, O1, O2, O3, O4, O5, O6, O7, O8>
   void parseAsync(State<ChunkedData<I>> state,
       VoidCallback1<(O1, O2, O3, O4, O5, O6, O7, O8)> onDone) {
     final input = state.input;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     final pos = state.pos;
     Result<O1>? r1;
     Result<O2>? r2;
@@ -1071,8 +1071,8 @@ class Tuple8<I, O1, O2, O3, O4, O5, O6, O7, O8>
       p8.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r8 = result;
@@ -1094,8 +1094,8 @@ class Tuple8<I, O1, O2, O3, O4, O5, O6, O7, O8>
       p7.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r7 = result;
@@ -1108,8 +1108,8 @@ class Tuple8<I, O1, O2, O3, O4, O5, O6, O7, O8>
       p6.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r6 = result;
@@ -1122,8 +1122,8 @@ class Tuple8<I, O1, O2, O3, O4, O5, O6, O7, O8>
       p5.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r5 = result;
@@ -1136,8 +1136,8 @@ class Tuple8<I, O1, O2, O3, O4, O5, O6, O7, O8>
       p4.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r4 = result;
@@ -1150,8 +1150,8 @@ class Tuple8<I, O1, O2, O3, O4, O5, O6, O7, O8>
       p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r3 = result;
@@ -1164,8 +1164,8 @@ class Tuple8<I, O1, O2, O3, O4, O5, O6, O7, O8>
       p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r2 = result;
@@ -1317,8 +1317,8 @@ class Tuple9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9>
   void parseAsync(State<ChunkedData<I>> state,
       VoidCallback1<(O1, O2, O3, O4, O5, O6, O7, O8, O9)> onDone) {
     final input = state.input;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     final pos = state.pos;
     Result<O1>? r1;
     Result<O2>? r2;
@@ -1333,8 +1333,8 @@ class Tuple9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9>
       p9.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r9 = result;
@@ -1357,8 +1357,8 @@ class Tuple9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9>
       p8.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r8 = result;
@@ -1371,8 +1371,8 @@ class Tuple9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9>
       p7.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r7 = result;
@@ -1385,8 +1385,8 @@ class Tuple9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9>
       p6.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r6 = result;
@@ -1399,8 +1399,8 @@ class Tuple9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9>
       p5.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r5 = result;
@@ -1413,8 +1413,8 @@ class Tuple9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9>
       p4.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r4 = result;
@@ -1427,8 +1427,8 @@ class Tuple9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9>
       p3.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r3 = result;
@@ -1441,8 +1441,8 @@ class Tuple9<I, O1, O2, O3, O4, O5, O6, O7, O8, O9>
       p2.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r2 = result;

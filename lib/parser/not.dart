@@ -40,8 +40,8 @@ class Not<I, O1> extends Parser<I, Object?> {
   @override
   void parseAsync(State<ChunkedData<I>> state, VoidCallback1<Object?> onDone) {
     final input = state.input;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     final pos = state.pos;
     void parse() {
       p.parseAsync(state, (result) {
@@ -49,8 +49,8 @@ class Not<I, O1> extends Parser<I, Object?> {
           onDone(Result(null));
         } else {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           state.fail<Object?>(ErrorUnexpectedInput(pos - state.pos));
           onDone(null);
         }

@@ -49,16 +49,16 @@ class Terminated<I, O1, O2> extends Parser<I, O1> {
   @override
   void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O1> onDone) {
     final input = state.input;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     final pos = state.pos;
     Result<O1>? r1;
     void parse2() {
       end.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           onDone(r1);

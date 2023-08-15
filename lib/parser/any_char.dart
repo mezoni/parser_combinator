@@ -41,32 +41,32 @@ class AnyChar extends Parser<StringReader, int> {
     final input = state.input;
     final buffer = input.buffer;
     final pos = state.pos;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     input.buffering++;
     bool parse() {
-      if (input.index0 < input.start) {
+      var i = input.position - input.start;
+      if (i < 0) {
         input.buffering--;
-        input.index0 = index0;
-        input.index1 = index1;
+        input.position = position;
+        input.index = index;
         state.failAt<Object?>(state.failPos, ErrorBacktrackingError(state.pos));
         state.pos = pos;
         onDone(null);
         return true;
       }
 
-      var index = input.index0 - input.start;
-      while (index < buffer.length) {
-        final chunk = buffer[index];
-        if (input.index1 >= chunk.length) {
-          index++;
-          input.index0++;
-          input.index1 = 0;
+      while (i < buffer.length) {
+        final chunk = buffer[i];
+        if (input.index >= chunk.length) {
+          i++;
+          input.position++;
+          input.index = 0;
           continue;
         }
 
-        final c = chunk.readChar(input.index1);
-        input.index1 += chunk.count;
+        final c = chunk.readChar(input.index);
+        input.index += chunk.count;
         state.pos += chunk.count;
         input.buffering--;
         onDone(Result(c));
@@ -75,8 +75,8 @@ class AnyChar extends Parser<StringReader, int> {
 
       if (input.isClosed) {
         input.buffering--;
-        input.index0 = index0;
-        input.index1 = index1;
+        input.position = position;
+        input.index = index;
         state.pos = pos;
         state.fail<Object?>(const ErrorUnexpectedEndOfInput());
         onDone(null);

@@ -56,16 +56,16 @@ class Delimited<I, O1, O2, O3> extends Parser<I, O2> {
   @override
   void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O2> onDone) {
     final input = state.input;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     final pos = state.pos;
     Result<O2>? r;
     void parse3() {
       end.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           onDone(r);
@@ -77,8 +77,8 @@ class Delimited<I, O1, O2, O3> extends Parser<I, O2> {
       p.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           onDone(null);
         } else {
           r = result;

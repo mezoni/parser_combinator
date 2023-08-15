@@ -56,16 +56,17 @@ class SkipWhile1 extends Parser<StringReader, String> {
       State<ChunkedData<StringReader>> state, VoidCallback1<String> onDone) {
     final input = state.input;
     final buffer = input.buffer;
-    final index0 = input.index0;
-    final index1 = input.index1;
+    final position = input.position;
+    final index = input.index;
     final pos = state.pos;
     var count = 0;
     input.buffering++;
     bool parse() {
-      if (input.index0 < input.start) {
+      var i = input.position - input.start;
+      if (i < 0) {
         input.buffering--;
-        input.index0 = index0;
-        input.index1 = index1;
+        input.position = position;
+        input.index = index;
         state.failAt<Object?>(state.failPos, ErrorBacktrackingError(state.pos));
         state.pos = pos;
         onDone(null);
@@ -73,25 +74,24 @@ class SkipWhile1 extends Parser<StringReader, String> {
       }
 
       var ok = true;
-      var index = input.index0 - input.start;
       int? c;
-      while (index < buffer.length) {
-        final chunk = buffer[index];
-        if (input.index1 >= chunk.length) {
-          index++;
-          input.index0++;
-          input.index1 = 0;
+      while (i < buffer.length) {
+        final chunk = buffer[i];
+        if (input.index >= chunk.length) {
+          i++;
+          input.position++;
+          input.index = 0;
           continue;
         }
 
-        c = chunk.readChar(input.index1);
+        c = chunk.readChar(input.index);
         if (!f(c)) {
           ok = false;
           break;
         }
 
         count++;
-        input.index1 += chunk.count;
+        input.index += chunk.count;
         state.pos += chunk.count;
       }
 
@@ -101,8 +101,8 @@ class SkipWhile1 extends Parser<StringReader, String> {
           onDone(Result(''));
           return true;
         } else {
-          input.index0 = index0;
-          input.index1 = index1;
+          input.position = position;
+          input.index = index;
           state.pos = pos;
           state.fail<Object?>(ErrorUnexpectedCharacter(c));
           onDone(null);
