@@ -4,12 +4,13 @@ import 'dart:io';
 import 'package:parser_combinator/extra/json_parser.dart' as json_parser;
 import 'package:parser_combinator/file_reader.dart';
 import 'package:parser_combinator/parsing.dart';
+import 'package:parser_combinator/string_reader.dart';
 import 'package:test/test.dart';
 
 void main() {
   _testFileReader();
-  _testParsingUsingUtf8FileReader();
-  _testUtf8FileReader();
+  _testParsingUsingUtf8Reader();
+  _testUtf8Reader();
 }
 
 void _testFileReader() {
@@ -36,8 +37,8 @@ void _testFileReader() {
   });
 }
 
-void _testParsingUsingUtf8FileReader() {
-  test('Parsing using Utf8FileReader', () {
+void _testParsingUsingUtf8Reader() {
+  test('Parsing using Utf8Reader', () {
     const source = '{"rocket": "🚀 flies to the stars"}';
     final charCodes = source.codeUnits;
     var bytes = Utf8Encoder().convert(String.fromCharCodes(charCodes)).toList();
@@ -51,7 +52,7 @@ void _testParsingUsingUtf8FileReader() {
 
     // Begin of parsing.
     final fileReader = FileReader(file.openSync(), bufferSize: 1024);
-    final utf8Reader = Utf8FileReader(fileReader);
+    final utf8Reader = Utf8Reader(fileReader);
     final result = parseInput(json_parser.parser.parse, utf8Reader);
     // End of parsing
 
@@ -63,8 +64,8 @@ void _testParsingUsingUtf8FileReader() {
   });
 }
 
-void _testUtf8FileReader() {
-  test('Utf8FileReader', () {
+void _testUtf8Reader() {
+  test('Utf8Reader', () {
     for (var step = 0; step < 2; step++) {
       final charCodes = <int>[];
       for (var i = 0; i < 0xd800; i++) {
@@ -88,7 +89,7 @@ void _testUtf8FileReader() {
 
       file.writeAsBytesSync(bytes);
       final fileReader = FileReader(file.openSync(), bufferSize: 1024);
-      final utf8Reader = Utf8FileReader(fileReader);
+      final utf8Reader = Utf8Reader(fileReader);
       final runes = String.fromCharCodes(charCodes).runes.toList();
       for (var i = 0, offset = 0; offset < utf8Reader.length; i++) {
         final c = utf8Reader.readChar(offset);

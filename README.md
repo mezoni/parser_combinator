@@ -81,7 +81,7 @@ An example of parsing from a text file.
 ```dart
 final file = File('test/temp.json');
 final fileReader = FileReader(file.openSync(), bufferSize: 1024);
-final utf8Reader = Utf8FileReader(fileReader);
+final utf8Reader = Utf8Reader(fileReader);
 try {
   return parseInput(json_parser.parser.parse, utf8Reader);
 } finally {
