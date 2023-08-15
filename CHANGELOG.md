@@ -1,3 +1,7 @@
+## 0.2.6
+
+- Minor changes to the way UTF8 text is parsed.
+
 ## 0.2.5
 
 - Minor changes in the JSON parser.
