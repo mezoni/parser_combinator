@@ -99,7 +99,6 @@ String _errorUnexpectedCharacter(StringReader input, int pos) =>
 
 Future<ParseResult<ChunkedData<StringReader>, Result<O>?>> _parseStream<O>(
   Parser<StringReader, O> p,
-  int bufferSize,
   String source,
 ) {
   final input = ChunkedData<StringReader>();
@@ -616,7 +615,7 @@ Future<void> _testFailure<O>(
   void Function(ParseResult<Object?, Object?> result)? testErrors,
 }) async {
   final input = StringReader(source);
-  final r0 = await _parseStream(p, _bufferSize, source);
+  final r0 = await _parseStream(p, source);
   final r1 = tryParse(p.parse, input);
   final r2 = tryFastParse(p.fastParse, input);
   final rs = [r0, r1, r2];
@@ -1639,7 +1638,7 @@ Future<void> _testSuccess<O>(
   void Function(Object? result)? testResult,
 }) async {
   final input = StringReader(source);
-  final r0 = await _parseStream<O>(p, _bufferSize, source);
+  final r0 = await _parseStream(p, source);
   final r1 = tryParse(p.parse, input);
   final r2 = tryFastParse(p.fastParse, input);
   final rs = [r0, r1, r2];

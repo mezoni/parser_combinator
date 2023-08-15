@@ -66,7 +66,7 @@ class Preceded<I, O1, O2> extends Parser<I, O2> {
     }
 
     void parse() {
-      this.start.parseAsync(state, (result) {
+      start.parseAsync(state, (result) {
         if (result == null) {
           onDone(null);
         } else {
