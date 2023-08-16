@@ -25,7 +25,16 @@ Future<Object?> _parseAsync(String source) async {
   final completer = Completer<Object?>();
   final input = ChunkedData<StringReader>();
   final state = State(input);
-  csv.parser.parseAsync(state, completer.complete);
+  csv.parser.parseAsync(
+    state,
+    (result) {
+      if (result == null) {
+        completer.complete(null);
+      } else {
+        completer.complete(result.value);
+      }
+    },
+  );
   for (final element in source.runes) {
     input.add(StringReader(String.fromCharCode(element)));
   }
@@ -34,16 +43,25 @@ Future<Object?> _parseAsync(String source) async {
   return completer.future;
 }
 
+Future<void> _testAll(String source, Object? result) async {
+  final r1 = _parse(false, source);
+  final r2 = _parse(true, source);
+  final r3 = await _parseAsync(source);
+  for (final r in [r1, r2, r3]) {
+    expect(r, result);
+  }
+}
+
 void _test() {
   for (final mode in [false, true]) {
     test('CSV parser', () async {
       {
-        const s = '''
+        const source = '''
 123''';
-        final r1 = _parse(mode, s);
-        expect(r1, [
+        final result = [
           ['123']
-        ]);
+        ];
+        await _testAll(source, result);
       }
 
       {

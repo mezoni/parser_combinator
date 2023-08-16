@@ -52,17 +52,17 @@ class ChunkedData<T> implements Sink<T> {
     }
 
     _isClosed = true;
-    if (listener != null) {
+    while (listener != null) {
       final f = listener!;
       if (f()) {
         listener = null;
       }
-    }
 
-    while (handler != null) {
-      final f = handler!;
-      handler = null;
-      f();
+      while (handler != null) {
+        final f = handler!;
+        handler = null;
+        f();
+      }
     }
 
     if (buffering != 0) {

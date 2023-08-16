@@ -1728,73 +1728,44 @@ void _testTag() {
 }
 
 void _testTags() {
-  test('Tags', () {
+  test('Tags', () async {
     {
       final p = Tags(['abc', 'def']);
       const source = 'abc';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, 'abc');
-      expect(r2.result, true);
-      expect(r1.pos, 3);
-      expect(r2.pos, 3);
+      const pos = 3;
+      const result = 'abc';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = Tags(['abc', 'def']);
       const source = 'def';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, 'def');
-      expect(r2.result, true);
-      expect(r1.pos, 3);
-      expect(r2.pos, 3);
+      const pos = 3;
+      const result = 'def';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
 
     {
       final p = Tags(['abc', 'def']);
       const source = '';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, false);
-      expect(r2.result, false);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(_errorsToSet(r1), {
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
         ErrorUnexpectedEndOfInput.message,
         _errorExpectedTags(['abc', 'def']),
-      });
-      expect(_errorsToSet(r2), {
-        ErrorUnexpectedEndOfInput.message,
-        _errorExpectedTags(['abc', 'def']),
-      });
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
 
     {
       final p = Tags(['abc', 'def']);
       const source = 'ab';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, false);
-      expect(r2.result, false);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(_errorsToSet(r1), {
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
         _errorExpectedTags(['abc', 'def']),
-      });
-      expect(_errorsToSet(r2), {
-        _errorExpectedTags(['abc', 'def']),
-      });
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
   });
 }

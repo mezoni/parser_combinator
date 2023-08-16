@@ -40,12 +40,19 @@ class Tags extends Parser<StringReader, String> {
 
     return state.fail(ErrorExpectedTags(tags));
   }
+
+  @override
+  void parseAsync(
+      State<ChunkedData<StringReader>> state, VoidCallback1<String> onDone) {
+    final p = _AsyncTagsParser(tags);
+    p.parseAsync(state, onDone);
+  }
 }
 
 class _AsyncTagsParser extends ChunkedDataParser<String> {
   int count = 0;
 
-  int count2 = 0;
+  int tagIndex = 0;
 
   final List<String> tags;
 
@@ -58,11 +65,11 @@ class _AsyncTagsParser extends ChunkedDataParser<String> {
 
   @override
   bool? parseChar(int c) {
-    if (count2 >= tags.length) {
+    if (tagIndex >= tags.length) {
       return false;
     }
 
-    final tag = tags[count2];
+    final tag = tags[tagIndex];
     if (c != tag.runeAt(count++)) {
       return false;
     }
@@ -77,11 +84,11 @@ class _AsyncTagsParser extends ChunkedDataParser<String> {
 
   @override
   bool? parseError() {
-    if (count2 >= tags.length) {
+    if (tagIndex >= tags.length) {
       return false;
     }
 
-    count2++;
+    tagIndex++;
     count = 0;
     return null;
   }
