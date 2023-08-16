@@ -25,18 +25,15 @@ Future<Object?> _parseAsync(String source) async {
   final completer = Completer<Object?>();
   final input = ChunkedData<StringReader>();
   final state = State(input);
-  csv.parser.parseAsync(
-    state,
-    (result) {
-      if (result == null) {
-        completer.complete(null);
-      } else {
-        completer.complete(result.value);
-      }
-    },
-  );
-  for (final element in source.runes) {
-    input.add(StringReader(String.fromCharCode(element)));
+  csv.parser.parseAsync(state, (result) {
+    if (result == null) {
+      completer.complete(null);
+    } else {
+      completer.complete(result.value);
+    }
+  });
+  for (final chunk in source.runes) {
+    input.add(StringReader(String.fromCharCode(chunk)));
   }
 
   input.close();
