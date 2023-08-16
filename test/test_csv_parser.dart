@@ -34,6 +34,7 @@ Future<Object?> _parseAsync(String source) async {
   });
   for (final chunk in source.runes) {
     input.add(StringReader(String.fromCharCode(chunk)));
+    await Future<void>.delayed(const Duration(microseconds: 1));
   }
 
   input.close();
