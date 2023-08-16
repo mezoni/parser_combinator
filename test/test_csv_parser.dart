@@ -53,103 +53,101 @@ Future<void> _testAll(String source, Object? result) async {
 }
 
 void _test() {
-  for (final mode in [false, true]) {
-    test('CSV parser', () async {
-      {
-        const source = '''
+  test('CSV parser', () async {
+    {
+      const source = '''
 123''';
-        final result = [
-          ['123']
-        ];
-        await _testAll(source, result);
-      }
+      final result = [
+        ['123']
+      ];
+      await _testAll(source, result);
+    }
 
-      {
-        const s = '''
+    {
+      const source = '''
 123
 ''';
-        final r1 = _parse(mode, s);
-        expect(r1, [
-          ['123']
-        ]);
-      }
+      final result = [
+        ['123']
+      ];
+      await _testAll(source, result);
+    }
 
-      {
-        const s = '''
+    {
+      const source = '''
 123
 456
 ''';
-        final r1 = _parse(mode, s);
+      final result = [
+        ['123'],
+        ['456']
+      ];
+      await _testAll(source, result);
+    }
 
-        expect(r1, [
-          ['123'],
-          ['456']
-        ]);
-      }
-
-      {
-        const s = '''
+    {
+      const source = '''
 123,"abc😄"
 456,def😄
 ''';
-        final r1 = _parse(mode, s);
-        expect(r1, [
-          ['123', 'abc😄'],
-          ['456', 'def😄']
-        ]);
-      }
+      final result = [
+        ['123', 'abc😄'],
+        ['456', 'def😄']
+      ];
+      await _testAll(source, result);
+    }
 
-      {
-        const s = '''
+    {
+      const source = '''
 123,"""abc😄"""
 456,def😄
 ''';
-        final r = _parse(mode, s);
-        expect(r, [
-          ['123', '"abc😄"'],
-          ['456', 'def😄']
-        ]);
-      }
+      final result = [
+        ['123', '"abc😄"'],
+        ['456', 'def😄']
+      ];
+      await _testAll(source, result);
+    }
 
-      {
-        const s = '''
+    {
+      const source = '''
 123,"ab""c😄"""
 456,def😄
 ''';
-        final r = _parse(mode, s);
-        expect(r, [
-          ['123', 'ab"c😄"'],
-          ['456', 'def😄']
-        ]);
-      }
+      final result = [
+        ['123', 'ab"c😄"'],
+        ['456', 'def😄']
+      ];
+      await _testAll(source, result);
+    }
 
-      {
-        const s = '''
+    {
+      const source = '''
 123,abc😄,1
 456,def😄,
 ''';
-        final r = _parse(mode, s);
-        expect(r, [
-          ['123', 'abc😄', '1'],
-          ['456', 'def😄', '']
-        ]);
-      }
+      final result = [
+        ['123', 'abc😄', '1'],
+        ['456', 'def😄', '']
+      ];
+      await _testAll(source, result);
+    }
 
-      {
-        const s = '''
+    {
+      const source = '''
 123,"multi
 line",1
 456,def😄,
 ''';
-        final r = _parse(mode, s);
-        expect(r, [
-          ['123', 'multi\nline', '1'],
-          ['456', 'def😄', '']
-        ]);
-      }
+      final result = [
+        ['123', 'multi\nline', '1'],
+        ['456', 'def😄', '']
+      ];
+      await _testAll(source, result);
+    }
 
-      {
-        const s = '''
+    {
+      const source = '''
 123,abc😄
 456,"multi
 line"
@@ -158,16 +156,15 @@ line"
 
 789
 ''';
-        final r = _parse(mode, s);
-        expect(r, [
-          ['123', 'abc😄'],
-          ['456', 'multi\nline'],
-          [''],
-          ['# Comment'],
-          [''],
-          ['789'],
-        ]);
-      }
-    });
-  }
+      final result = [
+        ['123', 'abc😄'],
+        ['456', 'multi\nline'],
+        [''],
+        ['# Comment'],
+        [''],
+        ['789'],
+      ];
+      await _testAll(source, result);
+    }
+  });
 }
