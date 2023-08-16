@@ -2,18 +2,18 @@ import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
 
-class TakeWhileMN extends Parser<StringReader, String> {
+class SkipWhileMN extends Parser<StringReader, String> {
   final Predicate<int> f;
 
   final int m;
 
   final int n;
 
-  const TakeWhileMN(this.m, this.n, this.f, {String? name}) : super(name);
+  const SkipWhileMN(this.m, this.n, this.f, {String? name}) : super(name);
 
   @override
   Parser<StringReader, String> build(ParserBuilder<StringReader> builder) {
-    return TakeWhileMN(name: name, m, n, f);
+    return SkipWhileMN(name: name, m, n, f);
   }
 
   @override
@@ -67,9 +67,7 @@ class TakeWhileMN extends Parser<StringReader, String> {
     }
 
     if (count >= m) {
-      return state.pos != pos
-          ? Result(input.substring(pos, state.pos))
-          : const Result('');
+      return const Result('');
     }
 
     final failPos = state.pos;
@@ -115,7 +113,7 @@ class TakeWhileMN extends Parser<StringReader, String> {
 
       input.buffering--;
       if (charCodes.length >= m) {
-        onDone(Result(String.fromCharCodes(charCodes)));
+        onDone(const Result(''));
       } else {
         state.fail<Object?>(ErrorUnexpectedCharacter(c));
         state.pos = pos;

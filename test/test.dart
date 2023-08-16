@@ -33,10 +33,12 @@ import 'package:parser_combinator/parser/separated_pair.dart';
 import 'package:parser_combinator/parser/sequence.dart';
 import 'package:parser_combinator/parser/skip_while.dart';
 import 'package:parser_combinator/parser/skip_while1.dart';
+import 'package:parser_combinator/parser/skip_while_m_n.dart';
 import 'package:parser_combinator/parser/tag.dart';
 import 'package:parser_combinator/parser/tags.dart';
 import 'package:parser_combinator/parser/take_while.dart';
 import 'package:parser_combinator/parser/take_while1.dart';
+import 'package:parser_combinator/parser/take_while_m_n.dart';
 import 'package:parser_combinator/parser/tuple.dart';
 import 'package:parser_combinator/parser_combinator.dart';
 import 'package:parser_combinator/parsing.dart';
@@ -45,41 +47,43 @@ import 'package:parser_combinator/streaming.dart';
 import 'package:test/test.dart' hide Tags;
 
 void main() async {
-  _testAllMatches();
-  _testAlpha(); // OK
-  _testAlpha1(); // OK
-  _testAnd(); // OK
-  _testAnyChar(); // OK
-  _testBuffered(); // OK
-  _testCalc(); // OK
-  _testChar(); //OK
-  _testChoice(); // OK
-  _testDelimited(); // OK
-  _testDigit(); // OK
-  _testDigit1(); // OK
-  _testEof(); // OK
-  _testExpected(); // OK
+  _testAllMatches(); // Not asynchronous
+  _testAlpha();
+  _testAlpha1();
+  _testAnd();
+  _testAnyChar();
+  _testBuffered();
+  _testCalc();
+  _testChar();
+  _testChoice();
+  _testDelimited();
+  _testDigit();
+  _testDigit1();
+  _testEof();
+  _testExpected();
   _testHasMatch();
-  _testFast(); // OK
-  _testInteger();
-  _testMalformed(); // OK
-  _testMany(); // OK
-  _testMany1(); // OK
-  _testManyTill(); // OK
-  _testMatch1();
-  _testReplaceAll();
-  _testSatisfy(); // OK
-  _testSeparatedList(); // OK
-  _testSeparatedList1(); // OK
-  _testSeparatedListMN();
-  _testSeparatedPair(); // OK
-  _testSequence(); // OK
-  _testSkipWhile(); // OK
-  _testSkipWhile1(); //OK
-  _testTag(); //OK
-  _testTags(); //OK
-  _testTakeWhile(); //OK
-  _testTakeWhile1(); //OK
+  _testFast();
+  _testInteger(); // Not asynchronous
+  _testMalformed();
+  _testMany();
+  _testMany1();
+  _testManyTill();
+  _testMatch1(); // Not asynchronous
+  _testReplaceAll(); // Not asynchronous
+  _testSatisfy();
+  _testSeparatedList();
+  _testSeparatedList1();
+  _testSeparatedListMN(); // Not asynchronous
+  _testSeparatedPair();
+  _testSequence();
+  _testSkipWhile();
+  _testSkipWhile1();
+  _testSkipWhileMN();
+  _testTag();
+  _testTags();
+  _testTakeWhile();
+  _testTakeWhile1();
+  _testTakeWhileMN();
 }
 
 String _errorExpectedCharacter(int char) =>
@@ -280,7 +284,7 @@ void _testAlpha1() {
       const failPos = 0;
       const pos = 0;
       final errors = {
-        _errorUnexpectedCharacter(input, 0),
+        _errorUnexpectedCharacter(input, failPos),
       };
       await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
@@ -1419,7 +1423,7 @@ void _testSatisfy() {
       const failPos = 0;
       const pos = 0;
       final errors = {
-        _errorUnexpectedCharacter(input, 0),
+        _errorUnexpectedCharacter(input, failPos),
       };
       await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
@@ -1825,7 +1829,86 @@ void _testSkipWhile1() {
       const failPos = 0;
       const pos = 0;
       final errors = {
-        _errorUnexpectedCharacter(input, 0),
+        _errorUnexpectedCharacter(input, failPos),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+  });
+}
+
+void _testSkipWhileMN() {
+  test('SkipWhileMN', () async {
+    {
+      final p = SkipWhileMN(0, 0, isAlpha);
+      const source = '';
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = SkipWhileMN(0, 1, isAlpha);
+      const source = '';
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = SkipWhileMN(0, 1, isAlpha);
+      const source = 'abc';
+      const pos = 1;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = SkipWhileMN(1, 1, isAlpha);
+      const source = 'abc';
+      const pos = 1;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = SkipWhileMN(1, 2, isAlpha);
+      const source = 'abc';
+      const pos = 2;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = SkipWhileMN(1, 1, isAlpha);
+      const source = '';
+      const pos = 0;
+      const failPos = 0;
+      final errors = {
+        ErrorUnexpectedEndOfInput.message,
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = TakeWhileMN(1, 1, isAlpha);
+      const source = '0';
+      final input = StringReader(source);
+      const pos = 0;
+      const failPos = 0;
+      final errors = {
+        _errorUnexpectedCharacter(input, failPos),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = TakeWhileMN(2, 2, isAlpha);
+      const source = 'a0';
+      final input = StringReader(source);
+      const pos = 0;
+      const failPos = 1;
+      final errors = {
+        _errorUnexpectedCharacter(input, failPos),
       };
       await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
@@ -2060,7 +2143,86 @@ void _testTakeWhile1() {
       const failPos = 0;
       const pos = 0;
       final errors = {
-        _errorUnexpectedCharacter(input, 0),
+        _errorUnexpectedCharacter(input, failPos),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+  });
+}
+
+void _testTakeWhileMN() {
+  test('TakeWhileMN', () async {
+    {
+      final p = TakeWhileMN(0, 0, isAlpha);
+      const source = '';
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = TakeWhileMN(0, 1, isAlpha);
+      const source = '';
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = TakeWhileMN(0, 1, isAlpha);
+      const source = 'abc';
+      const pos = 1;
+      const result = 'a';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = TakeWhileMN(1, 1, isAlpha);
+      const source = 'abc';
+      const pos = 1;
+      const result = 'a';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = TakeWhileMN(1, 2, isAlpha);
+      const source = 'abc';
+      const pos = 2;
+      const result = 'ab';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = TakeWhileMN(1, 1, isAlpha);
+      const source = '';
+      const pos = 0;
+      const failPos = 0;
+      final errors = {
+        ErrorUnexpectedEndOfInput.message,
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = TakeWhileMN(1, 1, isAlpha);
+      const source = '0';
+      final input = StringReader(source);
+      const pos = 0;
+      const failPos = 0;
+      final errors = {
+        _errorUnexpectedCharacter(input, failPos),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = TakeWhileMN(2, 2, isAlpha);
+      const source = 'a0';
+      final input = StringReader(source);
+      const pos = 0;
+      const failPos = 1;
+      final errors = {
+        _errorUnexpectedCharacter(input, failPos),
       };
       await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
