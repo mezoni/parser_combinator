@@ -23,7 +23,7 @@ class Buffered<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
     final input = state.input;
     void parse() {
       input.buffering++;

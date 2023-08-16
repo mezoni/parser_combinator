@@ -58,7 +58,8 @@ class SeparatedList1<I, O1, O2> extends Parser<I, List<O1>> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O1>> onDone) {
+  void parseAsync(
+      State<ChunkedData<I>> state, ResultCallback<List<O1>> onDone) {
     final input = state.input;
     final list = <O1>[];
     void parse2() {

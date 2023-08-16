@@ -49,29 +49,39 @@ class Char extends Parser<StringReader, int> {
 
   @override
   void parseAsync(
-      State<ChunkedData<StringReader>> state, VoidCallback1<int> onDone) {
-    final p = _AsyncCharParser(char);
-    p.parseAsync(state, onDone);
-  }
-}
+      State<ChunkedData<StringReader>> state, ResultCallback<int> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
+    }
 
-class _AsyncCharParser extends ChunkedDataParser<int> {
-  final int char;
+    final input = state.input;
+    input.buffering++;
+    bool parse() {
+      final data = input.data;
+      final start = input.start;
+      final end = start + data.length;
+      if (state.pos < end) {
+        final c = data.readChar(state.pos - start);
+        if (c == char) {
+          state.pos += data.count;
+          input.buffering--;
+          onDone(Result(c));
+          return true;
+        }
+      }
 
-  _AsyncCharParser(this.char);
+      if (!input.isClosed) {
+        input.listen(parse);
+        return false;
+      }
 
-  @override
-  void onError(State<ChunkedData<StringReader>> state) {
-    state.fail<Object?>(ErrorExpectedCharacter(char));
-  }
-
-  @override
-  bool? parseChar(int c) {
-    if (c == char) {
-      result = Result(c);
+      state.fail<Object?>(ErrorExpectedCharacter(char));
+      input.buffering--;
+      onDone(null);
       return true;
     }
 
-    return false;
+    parse();
   }
 }

@@ -53,44 +53,46 @@ class SkipWhile1 extends Parser<StringReader, String> {
 
   @override
   void parseAsync(
-      State<ChunkedData<StringReader>> state, VoidCallback1<String> onDone) {
-    final p = _AsyncSkipWhile1Parser(f);
-    p.parseAsync(state, onDone);
-  }
-}
-
-class _AsyncSkipWhile1Parser extends ChunkedDataParser<String> {
-  int count = 0;
-
-  final Predicate<int> f;
-
-  _AsyncSkipWhile1Parser(this.f);
-
-  int? c;
-
-  @override
-  void onError(State<ChunkedData<StringReader>> state) {
-    state.fail<Object?>(ErrorUnexpectedCharacter(c));
-  }
-
-  @override
-  bool? parseChar(int c) {
-    if (f(c)) {
-      count++;
-      return null;
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
     }
 
-    this.c = c;
-    return false;
-  }
+    final input = state.input;
+    var ok = false;
+    input.buffering++;
+    bool parse() {
+      final data = input.data;
+      final start = input.start;
+      final end = start + data.length;
+      int? c;
+      while (state.pos < end) {
+        c = data.readChar(state.pos - start);
+        if (!f(c)) {
+          break;
+        }
 
-  @override
-  bool parseError() {
-    if (count == 0) {
-      return false;
+        state.pos += data.count;
+        ok = true;
+      }
+
+      if (!input.isClosed) {
+        input.listen(parse);
+        return false;
+      }
+
+      input.buffering--;
+      if (!ok) {
+        state.fail<Object?>(ErrorUnexpectedCharacter(c));
+        onDone(null);
+      } else {
+        onDone(const Result(''));
+      }
+
+      return true;
     }
 
-    result = Result('');
-    return true;
+    parse();
   }
 }

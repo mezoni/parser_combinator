@@ -44,34 +44,37 @@ class SkipWhile extends Parser<StringReader, String> {
 
   @override
   void parseAsync(
-      State<ChunkedData<StringReader>> state, VoidCallback1<String> onDone) {
-    final p = _AsyncSkipWhileParser(f);
-    p.parseAsync(state, onDone);
-  }
-}
-
-class _AsyncSkipWhileParser extends ChunkedDataParser<String> {
-  final Predicate<int> f;
-
-  _AsyncSkipWhileParser(this.f);
-
-  @override
-  void onError(State<ChunkedData<StringReader>> state) {
-    state.fail<Object?>(const ErrorUnknownError());
-  }
-
-  @override
-  bool? parseChar(int c) {
-    if (f(c)) {
-      return null;
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
     }
 
-    return false;
-  }
+    final input = state.input;
+    input.buffering++;
+    bool parse() {
+      final data = input.data;
+      final start = input.start;
+      final end = start + data.length;
+      while (state.pos < end) {
+        final c = data.readChar(state.pos - start);
+        if (!f(c)) {
+          break;
+        }
 
-  @override
-  bool parseError() {
-    result = Result('');
-    return true;
+        state.pos += data.count;
+      }
+
+      if (!input.isClosed) {
+        input.listen(parse);
+        return false;
+      }
+
+      input.buffering--;
+      onDone(const Result(''));
+      return true;
+    }
+
+    parse();
   }
 }

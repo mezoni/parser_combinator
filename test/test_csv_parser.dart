@@ -20,10 +20,9 @@ List<List<String>> _parse(bool mode, String source) {
   }
 }
 
-// ignore: unused_element
 Future<Object?> _parseAsync(String source) async {
   final completer = Completer<Object?>();
-  final input = ChunkedData<StringReader>();
+  final input = StringReaderChunkedData();
   final state = State(input);
   csv.parser.parseAsync(state, (result) {
     if (result == null) {
@@ -34,7 +33,6 @@ Future<Object?> _parseAsync(String source) async {
   });
   for (final chunk in source.runes) {
     input.add(StringReader(String.fromCharCode(chunk)));
-    await Future<void>.delayed(const Duration(microseconds: 1));
   }
 
   input.close();

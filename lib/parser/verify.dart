@@ -48,7 +48,7 @@ class Verify<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
     final pos = state.pos;
     void parse() {
       p.parseAsync(state, (result) {

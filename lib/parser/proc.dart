@@ -25,7 +25,7 @@ class Proc<I> extends Parser<I, Object?> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<Object?> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<Object?> onDone) {
     f();
     onDone(Result(null));
   }

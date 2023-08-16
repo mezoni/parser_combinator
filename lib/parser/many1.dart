@@ -46,7 +46,7 @@ class Many1<I, O> extends Parser<I, List<O>> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<List<O>> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<List<O>> onDone) {
     final input = state.input;
     final list = <O>[];
     void parse() {

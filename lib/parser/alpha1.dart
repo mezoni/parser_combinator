@@ -51,41 +51,46 @@ class Alpha1 extends Parser<StringReader, String> {
 
   @override
   void parseAsync(
-      State<ChunkedData<StringReader>> state, VoidCallback1<String> onDone) {
-    final p = _AsyncAlpha1Parser();
-    p.parseAsync(state, onDone);
-  }
-}
-
-class _AsyncAlpha1Parser extends ChunkedDataParser<String> {
-  final List<int> charCodes = [];
-
-  int? c;
-
-  @override
-  void onError(State<ChunkedData<StringReader>> state) {
-    state.fail<Object?>(ErrorUnexpectedCharacter(c));
-  }
-
-  @override
-  bool? parseChar(int c) {
-    if (c >= 0x41 && c <= 0x5A || c >= 0x61 && c <= 0x7A) {
-      charCodes.add(c);
-      return null;
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
     }
 
-    this.c = c;
-    return false;
-  }
+    final input = state.input;
+    final charCodes = <int>[];
+    input.buffering++;
+    bool parse() {
+      final data = input.data;
+      final start = input.start;
+      final end = start + data.length;
+      int? c;
+      while (state.pos < end) {
+        c = data.readChar(state.pos - start);
+        if (!(c >= 0x41 && c <= 0x5A || c >= 0x61 && c <= 0x7A)) {
+          break;
+        }
 
-  @override
-  bool parseError() {
-    if (charCodes.isEmpty) {
-      return false;
+        state.pos += data.count;
+        charCodes.add(c);
+      }
+
+      if (!input.isClosed) {
+        input.listen(parse);
+        return false;
+      }
+
+      input.buffering--;
+      if (charCodes.isEmpty) {
+        state.fail<Object?>(ErrorUnexpectedCharacter(c));
+        onDone(null);
+      } else {
+        onDone(Result(String.fromCharCodes(charCodes)));
+      }
+
+      return true;
     }
 
-    final value = String.fromCharCodes(charCodes);
-    result = Result(value);
-    return true;
+    parse();
   }
 }

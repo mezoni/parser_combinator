@@ -6,12 +6,15 @@ import 'package:parser_combinator/parser/alpha1.dart';
 import 'package:parser_combinator/parser/and.dart';
 import 'package:parser_combinator/parser/any_char.dart';
 import 'package:parser_combinator/parser/buffered.dart';
+import 'package:parser_combinator/parser/calc.dart';
 import 'package:parser_combinator/parser/char.dart';
 import 'package:parser_combinator/parser/choice.dart';
+import 'package:parser_combinator/parser/delimited.dart';
 import 'package:parser_combinator/parser/digit.dart';
 import 'package:parser_combinator/parser/digit1.dart';
 import 'package:parser_combinator/parser/eof.dart';
 import 'package:parser_combinator/parser/expected.dart';
+import 'package:parser_combinator/parser/fast.dart';
 import 'package:parser_combinator/parser/has_match.dart';
 import 'package:parser_combinator/parser/integer.dart';
 import 'package:parser_combinator/parser/malformed.dart';
@@ -27,6 +30,7 @@ import 'package:parser_combinator/parser/separated_list.dart';
 import 'package:parser_combinator/parser/separated_list1.dart';
 import 'package:parser_combinator/parser/separated_list_m_n.dart';
 import 'package:parser_combinator/parser/separated_pair.dart';
+import 'package:parser_combinator/parser/sequence.dart';
 import 'package:parser_combinator/parser/skip_while.dart';
 import 'package:parser_combinator/parser/skip_while1.dart';
 import 'package:parser_combinator/parser/tag.dart';
@@ -47,12 +51,16 @@ void main() async {
   _testAnd(); // OK
   _testAnyChar(); // OK
   _testBuffered(); // OK
+  _testCalc(); // OK
   _testChar(); //OK
+  _testChoice(); // OK
+  _testDelimited(); // OK
   _testDigit(); // OK
   _testDigit1(); // OK
   _testEof(); // OK
   _testExpected(); // OK
   _testHasMatch();
+  _testFast(); // OK
   _testInteger();
   _testMalformed(); // OK
   _testMany(); // OK
@@ -65,15 +73,14 @@ void main() async {
   _testSeparatedList1(); // OK
   _testSeparatedListMN();
   _testSeparatedPair(); // OK
+  _testSequence(); // OK
   _testSkipWhile(); // OK
   _testSkipWhile1(); //OK
   _testTag(); //OK
-  _testTags();
+  _testTags(); //OK
   _testTakeWhile(); //OK
   _testTakeWhile1(); //OK
 }
-
-const _bufferSize = 4;
 
 String _errorExpectedCharacter(int char) =>
     ErrorExpectedCharacter(char).getErrorMessage(null, null).toString();
@@ -101,7 +108,7 @@ Future<ParseResult<ChunkedData<StringReader>, Result<O>?>> _parseStream<O>(
   Parser<StringReader, O> p,
   String source,
 ) {
-  final input = ChunkedData<StringReader>();
+  final input = StringReaderChunkedData();
   final completer =
       Completer<ParseResult<ChunkedData<StringReader>, Result<O>?>>();
   final state = State(input);
@@ -372,6 +379,26 @@ void _testBuffered() {
   });
 }
 
+void _testCalc() {
+  test('Calc', () async {
+    {
+      final p = Calc<StringReader, String>(() => 'abc');
+      const source = '1';
+      const pos = 0;
+      const result = 'abc';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = Calc<StringReader, String>(() => 'abc');
+      const source = '';
+      const pos = 0;
+      const result = 'abc';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+  });
+}
+
 void _testChar() {
   test('Char', () async {
     {
@@ -432,6 +459,94 @@ void _testChar() {
       const pos = 0;
       final errors = {
         _errorExpectedCharacter(128512),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+  });
+}
+
+void _testChoice() {
+  test('Choice', () async {
+    for (var i = 2; i < 10; i++) {
+      for (var j = 0; j < i; j++) {
+        final source = String.fromCharCode(j + 0x30);
+        Parser<StringReader, String>? p;
+        switch (i) {
+          case 2:
+            p = Choice2(Tag('0'), Tag('1'));
+            break;
+          case 3:
+            p = Choice3(Tag('0'), Tag('1'), Tag('2'));
+          case 4:
+            p = Choice4(Tag('0'), Tag('1'), Tag('2'), Tag('3'));
+          case 5:
+            p = Choice5(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'));
+          case 6:
+            p = Choice6(
+                Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'), Tag('5'));
+          case 7:
+            p = Choice7(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'),
+                Tag('5'), Tag('6'));
+          case 8:
+            p = Choice8(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'),
+                Tag('5'), Tag('6'), Tag('7'));
+          case 9:
+            p = Choice9(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'),
+                Tag('5'), Tag('6'), Tag('7'), Tag('8'));
+            break;
+          default:
+            throw UnimplementedError();
+        }
+
+        const pos = 1;
+        final result = source;
+        await _testSuccess(p, source, pos: pos, result: result);
+      }
+    }
+  });
+}
+
+void _testDelimited() {
+  test('Delimited', () async {
+    {
+      final p = Delimited(Tag('0'), Tag('1'), Tag('2'));
+      const source = '0123';
+      const pos = 3;
+      const result = '1';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = Delimited(Tag('0'), Tag('1'), Tag('2'));
+      const source = '01';
+      const failPos = 2;
+      const pos = 0;
+      final errors = {
+        ErrorUnexpectedEndOfInput.message,
+        _errorExpectedTags(['2']),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = Delimited(Tag('0'), Tag('1'), Tag('2'));
+      const source = '1';
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        _errorExpectedTags(['0']),
+      };
+      await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+
+    {
+      final p = Delimited(Tag('0'), Tag('1'), Tag('2'));
+      const source = '';
+      const failPos = 0;
+      const pos = 0;
+      final errors = {
+        ErrorUnexpectedEndOfInput.message,
+        _errorExpectedTags(['0']),
       };
       await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
     }
@@ -637,6 +752,48 @@ Future<void> _testFailure<O>(
       testErrors(r);
     }
   }
+}
+
+void _testFast() {
+  test('Fast', () async {
+    for (var i = 2; i < 10; i++) {
+      for (var j = 0; j < i; j++) {
+        final charCodes = List.generate(i, (i) => i + 0x30);
+        final source = String.fromCharCodes(charCodes);
+        Parser<StringReader, Object?>? p;
+        switch (i) {
+          case 2:
+            p = Fast2(Tag('0'), Tag('1'));
+            break;
+          case 3:
+            p = Fast3(Tag('0'), Tag('1'), Tag('2'));
+          case 4:
+            p = Fast4(Tag('0'), Tag('1'), Tag('2'), Tag('3'));
+          case 5:
+            p = Fast5(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'));
+          case 6:
+            p = Fast6(
+                Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'), Tag('5'));
+          case 7:
+            p = Fast7(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'),
+                Tag('5'), Tag('6'));
+          case 8:
+            p = Fast8(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'),
+                Tag('5'), Tag('6'), Tag('7'));
+          case 9:
+            p = Fast9(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'),
+                Tag('5'), Tag('6'), Tag('7'), Tag('8'));
+            break;
+          default:
+            throw UnimplementedError();
+        }
+
+        final pos = i;
+        const result = null;
+        await _testSuccess(p, source, pos: pos, result: result);
+      }
+    }
+  });
 }
 
 void _testHasMatch() {
@@ -1515,6 +1672,51 @@ void _testSeparatedPair() {
         _errorExpectedTags(['3'])
       };
       await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+  });
+}
+
+void _testSequence() {
+  test('Sequence', () async {
+    for (var i = 1; i < 10; i++) {
+      for (var j = 0; j < i; j++) {
+        final charCodes = List.generate(i, (i) => i + 0x30);
+        final source = String.fromCharCodes(charCodes);
+        final result = charCodes.map(String.fromCharCode).toList();
+        Parser<StringReader, Object?>? p;
+        switch (i) {
+          case 1:
+            p = Sequence1(Tag('0'));
+            break;
+          case 2:
+            p = Sequence2(Tag('0'), Tag('1'));
+            break;
+          case 3:
+            p = Sequence3(Tag('0'), Tag('1'), Tag('2'));
+          case 4:
+            p = Sequence4(Tag('0'), Tag('1'), Tag('2'), Tag('3'));
+          case 5:
+            p = Sequence5(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'));
+          case 6:
+            p = Sequence6(
+                Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'), Tag('5'));
+          case 7:
+            p = Sequence7(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'),
+                Tag('5'), Tag('6'));
+          case 8:
+            p = Sequence8(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'),
+                Tag('5'), Tag('6'), Tag('7'));
+          case 9:
+            p = Sequence9(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'),
+                Tag('5'), Tag('6'), Tag('7'), Tag('8'));
+            break;
+          default:
+            throw UnimplementedError();
+        }
+
+        final pos = i;
+        await _testSuccess(p, source, pos: pos, result: result);
+      }
     }
   });
 }

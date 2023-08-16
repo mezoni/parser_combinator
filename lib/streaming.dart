@@ -1,21 +1,23 @@
-class ChunkedData<T> implements Sink<T> {
+import 'runtime.dart';
+
+abstract class ChunkedData<T> implements Sink<T> {
   void Function()? handler;
 
   bool Function()? listener;
 
   bool _isClosed = false;
 
-  List<T> buffer = [];
-
   int buffering = 0;
 
-  int count = 0;
-
-  int position = 0;
-
-  int index = 0;
+  T data;
 
   int start = 0;
+
+  final T _empty;
+
+  ChunkedData(T empty)
+      : data = empty,
+        _empty = empty;
 
   bool get isClosed => _isClosed;
 
@@ -25,7 +27,14 @@ class ChunkedData<T> implements Sink<T> {
       throw StateError('Chunked data sink already closed');
     }
 
-    buffer.add(data);
+    if (buffering != 0) {
+      this.data = join(this.data, data);
+    } else {
+      final length = getLength(data);
+      start += length;
+      this.data = data;
+    }
+
     if (listener != null) {
       final f = listener!;
       if (f()) {
@@ -40,8 +49,7 @@ class ChunkedData<T> implements Sink<T> {
     }
 
     if (buffering == 0) {
-      start += buffer.length;
-      buffer = [];
+      //
     }
   }
 
@@ -69,22 +77,32 @@ class ChunkedData<T> implements Sink<T> {
       throw StateError('On closing, an incomplete buffering was detected');
     }
 
-    if (buffer.isNotEmpty) {
-      buffer = [];
+    final length = getLength(data);
+    if (length != 0) {
+      data = _empty;
     }
   }
+
+  int getLength(T data);
 
   void handle(void Function()? handler) {
     this.handler = handler;
   }
 
+  T join(T data1, T data2);
+
   void listen(bool Function()? listener) {
     this.listener = listener;
   }
+}
 
-  void trackCount(int count) {
-    if (this.count < count) {
-      this.count = count;
-    }
-  }
+class StringReaderChunkedData extends ChunkedData<StringReader> {
+  StringReaderChunkedData() : super(StringReader(''));
+
+  @override
+  int getLength(StringReader data) => data.length;
+
+  @override
+  StringReader join(StringReader data1, StringReader data2) =>
+      data1.length != 0 ? StringReader(data1.source! + data2.source!) : data2;
 }

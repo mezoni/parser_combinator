@@ -47,17 +47,13 @@ class Preceded<I, O1, O2> extends Parser<I, O2> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O2> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O2> onDone) {
     final input = state.input;
-    final position = input.position;
-    final index = input.index;
     final pos = state.pos;
     void parse2() {
       p.parseAsync(state, (result) {
         if (result == null) {
           state.pos = pos;
-          input.position = position;
-          input.index = index;
           onDone(null);
         } else {
           onDone(result);

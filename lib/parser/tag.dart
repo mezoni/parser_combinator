@@ -39,49 +39,61 @@ class Tag extends Parser<StringReader, String> {
 
   @override
   void parseAsync(
-      State<ChunkedData<StringReader>> state, VoidCallback1<String> onDone) {
-    final p = _AsyncTagParser(tag);
-    p.parseAsync(state, onDone);
-  }
-}
-
-class _AsyncTagParser extends ChunkedDataParser<String> {
-  int count = 0;
-
-  final String tag;
-
-  _AsyncTagParser(this.tag);
-
-  @override
-  void onError(State<ChunkedData<StringReader>> state) {
-    state.fail<Object?>(ErrorExpectedTag(tag));
-  }
-
-  @override
-  bool? parseChar(int c) {
-    if (count >= tag.length) {
-      return false;
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
     }
 
-    if (c != tag.runeAt(count++)) {
-      return false;
-    }
+    final input = state.input;
+    final pos = state.pos;
+    var offset = 0;
+    input.buffering++;
+    bool parse() {
+      final data = input.data;
+      final start = input.start;
+      final end = start + data.length;
+      if (offset == 0 && pos + tag.length <= end) {
+        input.buffering--;
+        if (data.startsWith(tag, state.pos)) {
+          state.pos += data.count;
+          onDone(Result(tag));
+        } else {
+          state.fail<Object?>(ErrorExpectedTag(tag));
+          onDone(null);
+        }
 
-    if (count == tag.length) {
-      result = Result(tag);
+        return true;
+      }
+
+      for (; offset < tag.length && state.pos < end;) {
+        final c = data.readChar(state.pos - start);
+        if (c != tag.runeAt(offset)) {
+          break;
+        }
+
+        state.pos += data.count;
+        offset += data.count;
+      }
+
+      if (offset == tag.length) {
+        input.buffering--;
+        onDone(Result(tag));
+        return true;
+      }
+
+      if (!input.isClosed) {
+        input.listen(parse);
+        return false;
+      }
+
+      input.buffering--;
+      state.pos = pos;
+      state.fail<Object?>(ErrorExpectedTag(tag));
+      onDone(null);
       return true;
     }
 
-    return null;
-  }
-
-  @override
-  bool? parseError() {
-    if (tag.isEmpty) {
-      result = const Result('');
-      return true;
-    }
-
-    return false;
+    parse();
   }
 }

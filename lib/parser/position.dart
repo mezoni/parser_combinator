@@ -21,7 +21,7 @@ class Position<I> extends Parser<I, int> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<int> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<int> onDone) {
     onDone(Result(state.pos));
   }
 }

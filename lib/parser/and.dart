@@ -37,10 +37,7 @@ class And<I, O1> extends Parser<I, Object?> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<Object?> onDone) {
-    final input = state.input;
-    final position = input.position;
-    final index = input.index;
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<Object?> onDone) {
     final pos = state.pos;
     void parse() {
       p.parseAsync(state, (result) {
@@ -48,8 +45,6 @@ class And<I, O1> extends Parser<I, Object?> {
           onDone(null);
         } else {
           state.pos = pos;
-          input.position = position;
-          input.index = index;
           onDone(Result(null));
         }
       });

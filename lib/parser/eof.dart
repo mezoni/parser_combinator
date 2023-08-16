@@ -31,29 +31,35 @@ class Eof extends Parser<StringReader, Object?> {
 
   @override
   void parseAsync(
-      State<ChunkedData<StringReader>> state, VoidCallback1<Object?> onDone) {
-    final p = _AsyncEofParser();
-    p.parseAsync(state, onDone);
-  }
-}
+      State<ChunkedData<StringReader>> state, ResultCallback<Object?> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
+    }
 
-class _AsyncEofParser extends ChunkedDataParser<Object?> {
-  var eof = true;
+    final input = state.input;
+    input.buffering++;
+    bool parse() {
+      final data = input.data;
+      final start = input.start;
+      final end = start + data.length;
+      if (state.pos < end) {
+        input.buffering--;
+        state.fail<Object?>(const ErrorExpectedEndOfInput());
+        onDone(null);
+        return true;
+      }
 
-  @override
-  void onError(State<ChunkedData<StringReader>> state) {
-    state.fail<Object?>(const ErrorExpectedEndOfInput());
-  }
+      if (!input.isClosed) {
+        input.listen(parse);
+        return false;
+      }
 
-  @override
-  bool? parseChar(int c) {
-    eof = false;
-    return false;
-  }
+      input.buffering--;
+      onDone(Result(null));
+      return true;
+    }
 
-  @override
-  bool parseError() {
-    result = Result(null);
-    return eof;
+    parse();
   }
 }

@@ -49,7 +49,7 @@ class Choice2<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
     final input = state.input;
     void parse2() {
       p2.parseAsync(state, (result) {
@@ -131,7 +131,7 @@ class Choice3<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
     final input = state.input;
     void parse3() {
       p3.parseAsync(state, (result) {
@@ -237,7 +237,7 @@ class Choice4<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
     final input = state.input;
     void parse4() {
       p4.parseAsync(state, (result) {
@@ -366,7 +366,7 @@ class Choice5<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
     final input = state.input;
     void parse5() {
       p5.parseAsync(state, (result) {
@@ -519,7 +519,7 @@ class Choice6<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
     final input = state.input;
     void parse6() {
       p6.parseAsync(state, (result) {
@@ -695,7 +695,7 @@ class Choice7<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
     final input = state.input;
     void parse7() {
       p7.parseAsync(state, (result) {
@@ -895,7 +895,7 @@ class Choice8<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
     final input = state.input;
     void parse8() {
       p8.parseAsync(state, (result) {
@@ -1118,7 +1118,7 @@ class Choice9<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
     final input = state.input;
     void parse9() {
       p9.parseAsync(state, (result) {

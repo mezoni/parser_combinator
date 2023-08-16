@@ -43,53 +43,66 @@ class Tags extends Parser<StringReader, String> {
 
   @override
   void parseAsync(
-      State<ChunkedData<StringReader>> state, VoidCallback1<String> onDone) {
-    final p = _AsyncTagsParser(tags);
-    p.parseAsync(state, onDone);
-  }
-}
-
-class _AsyncTagsParser extends ChunkedDataParser<String> {
-  int count = 0;
-
-  int tagIndex = 0;
-
-  final List<String> tags;
-
-  _AsyncTagsParser(this.tags);
-
-  @override
-  void onError(State<ChunkedData<StringReader>> state) {
-    state.fail<Object?>(ErrorExpectedTags(tags));
-  }
-
-  @override
-  bool? parseChar(int c) {
-    if (tagIndex >= tags.length) {
-      return false;
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
     }
 
-    final tag = tags[tagIndex];
-    if (c != tag.runeAt(count++)) {
-      return false;
+    if (tags.isEmpty) {
+      state.fail<Object?>(ErrorExpectedTags(tags));
+      onDone(null);
     }
 
-    if (count == tag.length) {
-      result = Result(tag);
+    final input = state.input;
+    final pos = state.pos;
+    var index = 0;
+    var offset = 0;
+    input.buffering++;
+    bool parse() {
+      final data = input.data;
+      final start = input.start;
+      final end = start + data.length;
+      for (; index < tags.length; index++) {
+        final tag = tags[index];
+        if (offset == 0 && pos + tag.length <= end) {
+          if (data.startsWith(tag, state.pos)) {
+            input.buffering--;
+            state.pos += data.count;
+            onDone(Result(tag));
+            return true;
+          }
+        }
+
+        for (; offset < tag.length && state.pos < end; offset) {
+          final c = data.readChar(state.pos - start);
+          if (c != tag.runeAt(offset)) {
+            break;
+          }
+
+          state.pos += data.count;
+          offset += data.count;
+        }
+
+        if (offset == tag.length) {
+          input.buffering--;
+          onDone(Result(tag));
+          return true;
+        }
+
+        if (!input.isClosed) {
+          input.listen(parse);
+          return false;
+        }
+      }
+
+      input.buffering--;
+      state.pos = pos;
+      state.fail<Object?>(ErrorExpectedTags(tags));
+      onDone(null);
       return true;
     }
 
-    return null;
-  }
-
-  @override
-  bool? parseError() {
-    if (tagIndex >= tags.length) {
-      return false;
-    }
-
-    tagIndex++;
-    count = 0;
-    return null;
+    parse();
   }
 }

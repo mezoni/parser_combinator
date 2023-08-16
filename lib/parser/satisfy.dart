@@ -43,32 +43,40 @@ class Satisfy extends Parser<StringReader, int> {
 
   @override
   void parseAsync(
-      State<ChunkedData<StringReader>> state, VoidCallback1<int> onDone) {
-    final p = _AsyncSatisfyParser(f);
-    p.parseAsync(state, onDone);
-  }
-}
+      State<ChunkedData<StringReader>> state, ResultCallback<int> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
+    }
 
-class _AsyncSatisfyParser extends ChunkedDataParser<int> {
-  int? c;
+    final input = state.input;
+    input.buffering++;
+    bool parse() {
+      final data = input.data;
+      final start = input.start;
+      final end = start + data.length;
+      int? c;
+      if (state.pos < end) {
+        c = data.readChar(state.pos - start);
+        if (f(c)) {
+          state.pos += data.count;
+          input.buffering--;
+          onDone(Result(c));
+          return true;
+        }
+      }
 
-  final Predicate<int> f;
+      if (!input.isClosed) {
+        input.listen(parse);
+        return false;
+      }
 
-  _AsyncSatisfyParser(this.f);
-
-  @override
-  void onError(State<ChunkedData<StringReader>> state) {
-    state.fail<Object?>(ErrorUnexpectedCharacter(c));
-  }
-
-  @override
-  bool? parseChar(int c) {
-    if (f(c)) {
-      result = Result(c);
+      state.fail<Object?>(ErrorUnexpectedCharacter(c));
+      input.buffering--;
+      onDone(null);
       return true;
     }
 
-    this.c = c;
-    return false;
+    parse();
   }
 }

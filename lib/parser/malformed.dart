@@ -55,7 +55,7 @@ class Malformed<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, VoidCallback1<O> onDone) {
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
     final failPos = state.failPos;
     final errorCount = state.errorCount;
     void parse() {

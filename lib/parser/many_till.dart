@@ -73,7 +73,7 @@ class ManyTill<I, O1, O2> extends Parser<I, (List<O1>, O2)> {
 
   @override
   void parseAsync(
-      State<ChunkedData<I>> state, VoidCallback1<(List<O1>, O2)> onDone) {
+      State<ChunkedData<I>> state, ResultCallback<(List<O1>, O2)> onDone) {
     final input = state.input;
     final pos = state.pos;
     final list = <O1>[];
