@@ -57,29 +57,27 @@ class Char extends Parser<StringReader, int> {
 
     final input = state.input;
     input.buffering++;
-    bool parse() {
+    void parse() {
+      if (input.isIncomplete(state.pos)) {
+        input.sleep = true;
+        input.handle(parse);
+        return;
+      }
+
       final data = input.data;
-      final start = input.start;
-      final end = start + data.length;
-      if (state.pos < end) {
-        final c = data.readChar(state.pos - start);
+      input.buffering--;
+      if (!input.isEnd(state.pos)) {
+        final source = data.source!;
+        final c = source.runeAt(state.pos - input.start);
         if (c == char) {
-          state.pos += data.count;
-          input.buffering--;
+          state.pos += c > 0xffff ? 2 : 1;
           onDone(Result(c));
-          return true;
+          return;
         }
       }
 
-      if (!input.isClosed) {
-        input.listen(parse);
-        return false;
-      }
-
       state.fail<Object?>(ErrorExpectedCharacter(char));
-      input.buffering--;
       onDone(null);
-      return true;
     }
 
     parse();

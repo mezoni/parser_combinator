@@ -54,33 +54,36 @@ class TakeWhile extends Parser<StringReader, String> {
     }
 
     final input = state.input;
-    final charCodes = <int>[];
+    final start = input.start;
+    final pos = state.pos;
     input.buffering++;
-    bool parse() {
+    void parse() {
       final data = input.data;
-      final start = input.start;
-      final end = start + data.length;
-      while (state.pos < end) {
-        final c = data.readChar(state.pos - start);
-        if (!f(c)) {
-          break;
+      final source = data.source!;
+      while (true) {
+        if (input.isIncomplete(state.pos)) {
+          input.sleep = true;
+          input.handle(parse);
+          return;
         }
 
-        state.pos += data.count;
-        charCodes.add(c);
-      }
+        if (!input.isEnd(state.pos)) {
+          final c = source.runeAt(state.pos - start);
+          if (f(c)) {
+            state.pos += c > 0xffff ? 2 : 1;
+            continue;
+          }
+        }
 
-      if (!input.isClosed) {
-        input.listen(parse);
-        return false;
-      }
+        input.buffering--;
+        if (state.pos != pos) {
+          onDone(Result(source.substring(pos - start, state.pos - start)));
+        } else {
+          onDone(const Result(''));
+        }
 
-      input.buffering--;
-      final result = charCodes.isNotEmpty
-          ? Result(String.fromCharCodes(charCodes))
-          : const Result('');
-      onDone(result);
-      return true;
+        return;
+      }
     }
 
     parse();

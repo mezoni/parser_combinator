@@ -52,6 +52,15 @@ void _test() {
   test('CSV parser', () async {
     {
       const source = '''
+1''';
+      final result = [
+        ['1']
+      ];
+      await _testAll(source, result);
+    }
+
+    {
+      const source = '''
 123''';
       final result = [
         ['123']

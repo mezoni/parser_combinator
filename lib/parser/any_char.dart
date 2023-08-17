@@ -45,27 +45,25 @@ class AnyChar extends Parser<StringReader, int> {
 
     final input = state.input;
     input.buffering++;
-    bool parse() {
-      final data = input.data;
-      final start = input.start;
-      final end = start + data.length;
-      if (state.pos < end) {
-        final c = data.readChar(state.pos - start);
-        state.pos += data.count;
-        input.buffering--;
-        onDone(Result(c));
-        return true;
+    void parse() {
+      if (input.isIncomplete(state.pos)) {
+        input.sleep = true;
+        input.handle(parse);
+        return;
       }
 
-      if (!input.isClosed) {
-        input.listen(parse);
-        return false;
+      final data = input.data;
+      input.buffering--;
+      if (!input.isEnd(state.pos)) {
+        final source = data.source!;
+        final c = source.runeAt(state.pos - input.start);
+        state.pos += c > 0xffff ? 2 : 1;
+        onDone(Result(c));
+        return;
       }
 
       state.fail<Object?>(const ErrorUnexpectedEndOfInput());
-      input.buffering--;
       onDone(null);
-      return true;
     }
 
     parse();

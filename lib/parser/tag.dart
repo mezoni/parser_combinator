@@ -45,53 +45,33 @@ class Tag extends Parser<StringReader, String> {
       return;
     }
 
+    if (tag.isEmpty) {
+      onDone(Result(tag));
+      return;
+    }
+
     final input = state.input;
-    final pos = state.pos;
-    var offset = 0;
     input.buffering++;
-    bool parse() {
+    void parse() {
+      if (input.isIncomplete(state.pos + tag.length)) {
+        input.sleep = true;
+        input.handle(parse);
+        return;
+      }
+
       final data = input.data;
-      final start = input.start;
-      final end = start + data.length;
-      if (offset == 0 && pos + tag.length <= end) {
-        input.buffering--;
-        if (data.startsWith(tag, state.pos)) {
-          state.pos += data.count;
-          onDone(Result(tag));
-        } else {
-          state.fail<Object?>(ErrorExpectedTag(tag));
-          onDone(null);
-        }
-
-        return true;
-      }
-
-      for (; offset < tag.length && state.pos < end;) {
-        final c = data.readChar(state.pos - start);
-        if (c != tag.runeAt(offset)) {
-          break;
-        }
-
-        state.pos += data.count;
-        offset += data.count;
-      }
-
-      if (offset == tag.length) {
+      final source = data.source!;
+      if (source.startsWith(tag, state.pos - input.start)) {
+        state.pos += tag.length;
         input.buffering--;
         onDone(Result(tag));
-        return true;
+        return;
       }
 
-      if (!input.isClosed) {
-        input.listen(parse);
-        return false;
-      }
-
-      input.buffering--;
-      state.pos = pos;
       state.fail<Object?>(ErrorExpectedTag(tag));
+      input.buffering--;
       onDone(null);
-      return true;
+      return;
     }
 
     parse();

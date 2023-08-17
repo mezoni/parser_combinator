@@ -1,15 +1,17 @@
 import 'runtime.dart';
 
 abstract class ChunkedData<T> implements Sink<T> {
-  void Function()? handler;
-
-  bool Function()? listener;
+  void Function()? _handler;
 
   bool _isClosed = false;
 
   int buffering = 0;
 
   T data;
+
+  int end = 0;
+
+  bool sleep = false;
 
   int start = 0;
 
@@ -30,22 +32,20 @@ abstract class ChunkedData<T> implements Sink<T> {
     if (buffering != 0) {
       this.data = join(this.data, data);
     } else {
-      final length = getLength(data);
-      start += length;
+      start = end;
       this.data = data;
     }
 
-    if (listener != null) {
-      final f = listener!;
-      if (f()) {
-        listener = null;
+    end = start + getLength(this.data);
+    sleep = false;
+    while (!sleep) {
+      final h = _handler;
+      _handler = null;
+      if (h == null) {
+        break;
       }
-    }
 
-    while (handler != null) {
-      final f = handler!;
-      handler = null;
-      f();
+      h();
     }
 
     if (buffering == 0) {
@@ -60,17 +60,15 @@ abstract class ChunkedData<T> implements Sink<T> {
     }
 
     _isClosed = true;
-    while (listener != null) {
-      final f = listener!;
-      if (f()) {
-        listener = null;
+    sleep = false;
+    while (!sleep) {
+      final h = _handler;
+      _handler = null;
+      if (h == null) {
+        break;
       }
 
-      while (handler != null) {
-        final f = handler!;
-        handler = null;
-        f();
-      }
+      h();
     }
 
     if (buffering != 0) {
@@ -86,14 +84,20 @@ abstract class ChunkedData<T> implements Sink<T> {
   int getLength(T data);
 
   void handle(void Function()? handler) {
-    this.handler = handler;
+    if (_handler != null && handler != null) {
+      throw StateError('Handler already specified');
+    }
+
+    _handler = handler;
   }
+
+  @pragma('vm:prefer-inline')
+  bool isEnd(int offset) => offset >= end && isClosed;
+
+  @pragma('vm:prefer-inline')
+  bool isIncomplete(int offset) => offset >= end && !isClosed;
 
   T join(T data1, T data2);
-
-  void listen(bool Function()? listener) {
-    this.listener = listener;
-  }
 }
 
 class StringReaderChunkedData extends ChunkedData<StringReader> {

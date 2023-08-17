@@ -50,31 +50,30 @@ class Satisfy extends Parser<StringReader, int> {
     }
 
     final input = state.input;
+    final start = input.start;
     input.buffering++;
-    bool parse() {
+    void parse() {
       final data = input.data;
-      final start = input.start;
-      final end = start + data.length;
+      if (input.isIncomplete(state.pos)) {
+        input.sleep = true;
+        input.handle(parse);
+        return;
+      }
+
+      input.buffering--;
       int? c;
-      if (state.pos < end) {
-        c = data.readChar(state.pos - start);
+      if (!input.isEnd(state.pos)) {
+        final source = data.source!;
+        c = source.runeAt(state.pos - start);
         if (f(c)) {
-          state.pos += data.count;
-          input.buffering--;
+          state.pos += c > 0xffff ? 2 : 1;
           onDone(Result(c));
-          return true;
+          return;
         }
       }
 
-      if (!input.isClosed) {
-        input.listen(parse);
-        return false;
-      }
-
       state.fail<Object?>(ErrorUnexpectedCharacter(c));
-      input.buffering--;
       onDone(null);
-      return true;
     }
 
     parse();

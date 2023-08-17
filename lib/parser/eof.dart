@@ -38,26 +38,21 @@ class Eof extends Parser<StringReader, Object?> {
     }
 
     final input = state.input;
-    input.buffering++;
-    bool parse() {
-      final data = input.data;
-      final start = input.start;
-      final end = start + data.length;
-      if (state.pos < end) {
-        input.buffering--;
+    void parse() {
+      if (input.isIncomplete(state.pos)) {
+        input.sleep = true;
+        input.handle(parse);
+        return;
+      }
+
+      if (input.isEnd(state.pos)) {
+        onDone(Result(null));
+      } else {
         state.fail<Object?>(const ErrorExpectedEndOfInput());
         onDone(null);
-        return true;
       }
 
-      if (!input.isClosed) {
-        input.listen(parse);
-        return false;
-      }
-
-      input.buffering--;
-      onDone(Result(null));
-      return true;
+      return;
     }
 
     parse();

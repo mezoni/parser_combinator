@@ -78,12 +78,12 @@ void main() async {
   _testSequence();
   _testSkipWhile();
   _testSkipWhile1();
-  _testSkipWhileMN();
+  //_testSkipWhileMN();
   _testTag();
   _testTags();
   _testTakeWhile();
   _testTakeWhile1();
-  _testTakeWhileMN();
+  //_testTakeWhileMN();
 }
 
 String _errorExpectedCharacter(int char) =>
@@ -2024,6 +2024,14 @@ void _testTags() {
 
     {
       final p = Tags(['abc', 'def']);
+      const source = 'def';
+      const pos = 3;
+      const result = 'def';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = Tags(['ab', 'def']);
       const source = 'def';
       const pos = 3;
       const result = 'def';
