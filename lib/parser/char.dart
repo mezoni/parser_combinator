@@ -58,7 +58,8 @@ class Char extends Parser<StringReader, int> {
     final input = state.input;
     input.buffering++;
     void parse() {
-      if (input.isIncomplete(state.pos)) {
+      final end = input.end;
+      if (state.pos >= end && !input.isClosed) {
         input.sleep = true;
         input.handle(parse);
         return;
@@ -66,7 +67,7 @@ class Char extends Parser<StringReader, int> {
 
       final data = input.data;
       input.buffering--;
-      if (!input.isEnd(state.pos)) {
+      if (state.pos < end) {
         final source = data.source!;
         final c = source.runeAt(state.pos - input.start);
         if (c == char) {

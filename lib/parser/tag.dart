@@ -45,15 +45,11 @@ class Tag extends Parser<StringReader, String> {
       return;
     }
 
-    if (tag.isEmpty) {
-      onDone(Result(tag));
-      return;
-    }
-
     final input = state.input;
     input.buffering++;
     void parse() {
-      if (input.isIncomplete(state.pos + tag.length)) {
+      final end = input.end;
+      while (state.pos + tag.length > end && !input.isClosed) {
         input.sleep = true;
         input.handle(parse);
         return;

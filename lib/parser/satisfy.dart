@@ -54,7 +54,8 @@ class Satisfy extends Parser<StringReader, int> {
     input.buffering++;
     void parse() {
       final data = input.data;
-      if (input.isIncomplete(state.pos)) {
+      final end = input.end;
+      if (state.pos >= end && !input.isClosed) {
         input.sleep = true;
         input.handle(parse);
         return;
@@ -62,7 +63,7 @@ class Satisfy extends Parser<StringReader, int> {
 
       input.buffering--;
       int? c;
-      if (!input.isEnd(state.pos)) {
+      if (state.pos < end) {
         final source = data.source!;
         c = source.runeAt(state.pos - start);
         if (f(c)) {

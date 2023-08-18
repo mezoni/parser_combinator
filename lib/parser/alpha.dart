@@ -58,29 +58,30 @@ class Alpha extends Parser<StringReader, String> {
     void parse() {
       final data = input.data;
       final source = data.source!;
-      while (true) {
-        if (input.isIncomplete(state.pos)) {
-          input.sleep = true;
-          input.handle(parse);
-          return;
+      final end = input.end;
+      var ok = true;
+      int? c;
+      while (state.pos < end) {
+        c = source.runeAt(state.pos - start);
+        if (!(c >= 0x41 && c <= 0x5A || c >= 0x61 && c <= 0x7A)) {
+          ok = false;
+          break;
         }
 
-        if (!input.isEnd(state.pos)) {
-          final c = source.runeAt(state.pos - start);
-          if (c >= 0x41 && c <= 0x5A || c >= 0x61 && c <= 0x7A) {
-            state.pos++;
-            continue;
-          }
-        }
+        state.pos++;
+      }
 
-        input.buffering--;
-        if (state.pos != pos) {
-          onDone(Result(source.substring(pos - start, state.pos - start)));
-        } else {
-          onDone(const Result(''));
-        }
-
+      if (ok && !input.isClosed) {
+        input.sleep = true;
+        input.handle(parse);
         return;
+      }
+
+      input.buffering--;
+      if (state.pos != pos) {
+        onDone(Result(source.substring(pos - start, state.pos - start)));
+      } else {
+        onDone(const Result(''));
       }
     }
 

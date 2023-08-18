@@ -58,29 +58,30 @@ class Digit extends Parser<StringReader, String> {
     void parse() {
       final data = input.data;
       final source = data.source!;
-      while (true) {
-        if (input.isIncomplete(state.pos)) {
-          input.sleep = true;
-          input.handle(parse);
-          return;
+      final end = input.end;
+      var ok = true;
+      int? c;
+      while (state.pos < end) {
+        c = source.runeAt(state.pos - start);
+        if (!(c >= 0x30 && c <= 0x39)) {
+          ok = false;
+          break;
         }
 
-        if (!input.isEnd(state.pos)) {
-          final c = source.runeAt(state.pos - start);
-          if (c >= 0x30 && c <= 0x39) {
-            state.pos++;
-            continue;
-          }
-        }
+        state.pos++;
+      }
 
-        input.buffering--;
-        if (state.pos != pos) {
-          onDone(Result(source.substring(pos - start, state.pos - start)));
-        } else {
-          onDone(const Result(''));
-        }
-
+      if (ok && !input.isClosed) {
+        input.sleep = true;
+        input.handle(parse);
         return;
+      }
+
+      input.buffering--;
+      if (state.pos != pos) {
+        onDone(Result(source.substring(pos - start, state.pos - start)));
+      } else {
+        onDone(const Result(''));
       }
     }
 

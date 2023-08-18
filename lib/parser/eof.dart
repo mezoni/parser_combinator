@@ -39,13 +39,14 @@ class Eof extends Parser<StringReader, Object?> {
 
     final input = state.input;
     void parse() {
-      if (input.isIncomplete(state.pos)) {
+      final end = input.end;
+      if (state.pos >= end && !input.isClosed) {
         input.sleep = true;
         input.handle(parse);
         return;
       }
 
-      if (input.isEnd(state.pos)) {
+      if (state.pos >= end) {
         onDone(Result(null));
       } else {
         state.fail<Object?>(const ErrorExpectedEndOfInput());

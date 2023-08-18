@@ -91,12 +91,6 @@ abstract class ChunkedData<T> implements Sink<T> {
     _handler = handler;
   }
 
-  @pragma('vm:prefer-inline')
-  bool isEnd(int offset) => offset >= end && isClosed;
-
-  @pragma('vm:prefer-inline')
-  bool isIncomplete(int offset) => offset >= end && !isClosed;
-
   T join(T data1, T data2);
 }
 

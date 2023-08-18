@@ -51,29 +51,32 @@ class SkipWhile extends Parser<StringReader, String> {
     }
 
     final input = state.input;
+    final start = input.start;
     input.buffering++;
     void parse() {
       final data = input.data;
       final source = data.source!;
-      while (true) {
-        if (input.isIncomplete(state.pos)) {
-          input.sleep = true;
-          input.handle(parse);
-          return;
+      final end = input.end;
+      var ok = true;
+      int? c;
+      while (state.pos < end) {
+        c = source.runeAt(state.pos - start);
+        if (!f(c)) {
+          ok = false;
+          break;
         }
 
-        if (!input.isEnd(state.pos)) {
-          final c = source.runeAt(state.pos - input.start);
-          if (f(c)) {
-            state.pos += c > 0xffff ? 2 : 1;
-            continue;
-          }
-        }
+        state.pos += c > 0xffff ? 2 : 1;
+      }
 
-        input.buffering--;
-        onDone(const Result(''));
+      if (ok && !input.isClosed) {
+        input.sleep = true;
+        input.handle(parse);
         return;
       }
+
+      input.buffering--;
+      onDone(const Result(''));
     }
 
     parse();

@@ -68,9 +68,10 @@ class Tags extends Parser<StringReader, String> {
     void parse() {
       final data = input.data;
       final source = data.source!;
+      final end = input.end;
       for (; index < tags.length; index++) {
         final tag = tags[index];
-        if (input.isIncomplete(state.pos + tag.length)) {
+        if (state.pos + tag.length > end && !input.isClosed) {
           input.sleep = true;
           input.handle(parse);
           return;
