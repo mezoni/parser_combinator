@@ -7,23 +7,21 @@ import '../parser/many.dart';
 import '../parser/map.dart';
 import '../parser/not.dart';
 import '../parser/opt.dart';
+import '../parser/satisfy.dart';
 import '../parser/separated_list1.dart';
 import '../parser/skip_while.dart';
 import '../parser/tag.dart';
 import '../parser/tags.dart';
 import '../parser/take_while.dart';
-import '../parser/take_while1.dart';
 import '../parser/terminated.dart';
 import '../parser/value.dart';
 
 const parser = Terminated(name: 'parser', _rows, _eof);
 
 const _chars = Many(Choice2(
-  TakeWhile1(isNotQuote),
-  ValueP('"', Tag('""')),
+  Satisfy(isNotQuote),
+  ValueP(0x22, Tag('""')),
 ));
-
-String joinStrings(List<String> list) => list.join();
 
 const _closeQuote = Fast2(name: '_closeQuote', _quote, _ws);
 
@@ -45,7 +43,7 @@ const _rows =
     Terminated(name: '_rows', SeparatedList1(_row, _rowEnding), Opt(_eol));
 
 const _string = Malformed(
-    Map1(Delimited(_openQuote, _chars, _closeQuote), joinStrings),
+    Map1(Delimited(_openQuote, _chars, _closeQuote), String.fromCharCodes),
     'Untermnated string');
 
 const _text = TakeWhile(name: '_text', isTextChar);

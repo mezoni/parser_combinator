@@ -101,6 +101,7 @@ class StringReaderChunkedData extends ChunkedData<StringReader> {
   int getLength(StringReader data) => data.length;
 
   @override
-  StringReader join(StringReader data1, StringReader data2) =>
-      data1.length != 0 ? StringReader(data1.source! + data2.source!) : data2;
+  StringReader join(StringReader data1, StringReader data2) => data1.length != 0
+      ? StringReader('${data1.source}${data2.source}')
+      : data2;
 }
