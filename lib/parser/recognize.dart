@@ -1,5 +1,6 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
+import '../streaming.dart';
 
 class Recognize<O> extends Parser<StringReader, String> {
   final Parser<StringReader, O> p;
@@ -27,6 +28,40 @@ class Recognize<O> extends Parser<StringReader, String> {
     }
 
     return null;
+  }
+
+  @override
+  void parseAsync(
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
+    }
+
+    final input = state.input;
+    final start = input.start;
+    final pos = state.pos;
+    input.buffering++;
+    void parse() {
+      p.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.buffering--;
+          final data = input.data;
+          final source = data.source!;
+          if (state.pos != pos) {
+            onDone(Result(source.substring(pos - start, state.pos - start)));
+          } else {
+            onDone(const Result(''));
+          }
+        }
+      });
+    }
+
+    parse();
   }
 }
 
@@ -72,6 +107,51 @@ class Recognize2<O1, O2> extends Parser<StringReader, String> {
 
     state.pos = pos;
     return null;
+  }
+
+  @override
+  void parseAsync(
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
+    }
+
+    final input = state.input;
+    final start = input.start;
+    final pos = state.pos;
+    input.buffering++;
+    void parse2() {
+      p2.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.buffering--;
+          final data = input.data;
+          final source = data.source!;
+          if (state.pos != pos) {
+            onDone(Result(source.substring(pos - start, state.pos - start)));
+          } else {
+            onDone(const Result(''));
+          }
+        }
+      });
+    }
+
+    void parse() {
+      p1.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          onDone(null);
+        } else {
+          input.handle(parse2);
+        }
+      });
+    }
+
+    parse();
   }
 }
 
@@ -126,6 +206,63 @@ class Recognize3<O1, O2, O3> extends Parser<StringReader, String> {
 
     state.pos = pos;
     return null;
+  }
+
+  @override
+  void parseAsync(
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
+    }
+
+    final input = state.input;
+    final start = input.start;
+    final pos = state.pos;
+    input.buffering++;
+    void parse3() {
+      p3.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.buffering--;
+          final data = input.data;
+          final source = data.source!;
+          if (state.pos != pos) {
+            onDone(Result(source.substring(pos - start, state.pos - start)));
+          } else {
+            onDone(const Result(''));
+          }
+        }
+      });
+    }
+
+    void parse2() {
+      p2.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse3);
+        }
+      });
+    }
+
+    void parse() {
+      p1.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          onDone(null);
+        } else {
+          input.handle(parse2);
+        }
+      });
+    }
+
+    parse();
   }
 }
 
@@ -193,6 +330,75 @@ class Recognize4<O1, O2, O3, O4> extends Parser<StringReader, String> {
 
     state.pos = pos;
     return null;
+  }
+
+  @override
+  void parseAsync(
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
+    }
+
+    final input = state.input;
+    final start = input.start;
+    final pos = state.pos;
+    input.buffering++;
+    void parse4() {
+      p4.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.buffering--;
+          final data = input.data;
+          final source = data.source!;
+          if (state.pos != pos) {
+            onDone(Result(source.substring(pos - start, state.pos - start)));
+          } else {
+            onDone(const Result(''));
+          }
+        }
+      });
+    }
+
+    void parse3() {
+      p3.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse4);
+        }
+      });
+    }
+
+    void parse2() {
+      p2.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse3);
+        }
+      });
+    }
+
+    void parse() {
+      p1.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          onDone(null);
+        } else {
+          input.handle(parse2);
+        }
+      });
+    }
+
+    parse();
   }
 }
 
@@ -269,6 +475,87 @@ class Recognize5<O1, O2, O3, O4, O5> extends Parser<StringReader, String> {
 
     state.pos = pos;
     return null;
+  }
+
+  @override
+  void parseAsync(
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
+    }
+
+    final input = state.input;
+    final start = input.start;
+    final pos = state.pos;
+    input.buffering++;
+    void parse5() {
+      p5.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.buffering--;
+          final data = input.data;
+          final source = data.source!;
+          if (state.pos != pos) {
+            onDone(Result(source.substring(pos - start, state.pos - start)));
+          } else {
+            onDone(const Result(''));
+          }
+        }
+      });
+    }
+
+    void parse4() {
+      p4.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse5);
+        }
+      });
+    }
+
+    void parse3() {
+      p3.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse4);
+        }
+      });
+    }
+
+    void parse2() {
+      p2.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse3);
+        }
+      });
+    }
+
+    void parse() {
+      p1.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          onDone(null);
+        } else {
+          input.handle(parse2);
+        }
+      });
+    }
+
+    parse();
   }
 }
 
@@ -355,6 +642,99 @@ class Recognize6<O1, O2, O3, O4, O5, O6> extends Parser<StringReader, String> {
 
     state.pos = pos;
     return null;
+  }
+
+  @override
+  void parseAsync(
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
+    }
+
+    final input = state.input;
+    final start = input.start;
+    final pos = state.pos;
+    input.buffering++;
+    void parse6() {
+      p6.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.buffering--;
+          final data = input.data;
+          final source = data.source!;
+          if (state.pos != pos) {
+            onDone(Result(source.substring(pos - start, state.pos - start)));
+          } else {
+            onDone(const Result(''));
+          }
+        }
+      });
+    }
+
+    void parse5() {
+      p5.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse6);
+        }
+      });
+    }
+
+    void parse4() {
+      p4.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse5);
+        }
+      });
+    }
+
+    void parse3() {
+      p3.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse4);
+        }
+      });
+    }
+
+    void parse2() {
+      p2.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse3);
+        }
+      });
+    }
+
+    void parse() {
+      p1.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          onDone(null);
+        } else {
+          input.handle(parse2);
+        }
+      });
+    }
+
+    parse();
   }
 }
 
@@ -452,6 +832,111 @@ class Recognize7<O1, O2, O3, O4, O5, O6, O7>
 
     state.pos = pos;
     return null;
+  }
+
+  @override
+  void parseAsync(
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
+    }
+
+    final input = state.input;
+    final start = input.start;
+    final pos = state.pos;
+    input.buffering++;
+    void parse7() {
+      p7.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.buffering--;
+          final data = input.data;
+          final source = data.source!;
+          if (state.pos != pos) {
+            onDone(Result(source.substring(pos - start, state.pos - start)));
+          } else {
+            onDone(const Result(''));
+          }
+        }
+      });
+    }
+
+    void parse6() {
+      p6.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse7);
+        }
+      });
+    }
+
+    void parse5() {
+      p5.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse6);
+        }
+      });
+    }
+
+    void parse4() {
+      p4.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse5);
+        }
+      });
+    }
+
+    void parse3() {
+      p3.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse4);
+        }
+      });
+    }
+
+    void parse2() {
+      p2.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse3);
+        }
+      });
+    }
+
+    void parse() {
+      p1.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          onDone(null);
+        } else {
+          input.handle(parse2);
+        }
+      });
+    }
+
+    parse();
   }
 }
 
@@ -558,6 +1043,123 @@ class Recognize8<O1, O2, O3, O4, O5, O6, O7, O8>
 
     state.pos = pos;
     return null;
+  }
+
+  @override
+  void parseAsync(
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
+    }
+
+    final input = state.input;
+    final start = input.start;
+    final pos = state.pos;
+    input.buffering++;
+    void parse8() {
+      p8.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.buffering--;
+          final data = input.data;
+          final source = data.source!;
+          if (state.pos != pos) {
+            onDone(Result(source.substring(pos - start, state.pos - start)));
+          } else {
+            onDone(const Result(''));
+          }
+        }
+      });
+    }
+
+    void parse7() {
+      p7.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse8);
+        }
+      });
+    }
+
+    void parse6() {
+      p6.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse7);
+        }
+      });
+    }
+
+    void parse5() {
+      p5.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse6);
+        }
+      });
+    }
+
+    void parse4() {
+      p4.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse5);
+        }
+      });
+    }
+
+    void parse3() {
+      p3.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse4);
+        }
+      });
+    }
+
+    void parse2() {
+      p2.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse3);
+        }
+      });
+    }
+
+    void parse() {
+      p1.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          onDone(null);
+        } else {
+          input.handle(parse2);
+        }
+      });
+    }
+
+    parse();
   }
 }
 
@@ -673,5 +1275,134 @@ class Recognize9<O1, O2, O3, O4, O5, O6, O7, O8, O9>
 
     state.pos = pos;
     return null;
+  }
+
+  @override
+  void parseAsync(
+      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+    if (!backtrack(state)) {
+      onDone(null);
+      return;
+    }
+
+    final input = state.input;
+    final start = input.start;
+    final pos = state.pos;
+    input.buffering++;
+    void parse9() {
+      p9.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.buffering--;
+          final data = input.data;
+          final source = data.source!;
+          if (state.pos != pos) {
+            onDone(Result(source.substring(pos - start, state.pos - start)));
+          } else {
+            onDone(const Result(''));
+          }
+        }
+      });
+    }
+
+    void parse8() {
+      p8.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse9);
+        }
+      });
+    }
+
+    void parse7() {
+      p7.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse8);
+        }
+      });
+    }
+
+    void parse6() {
+      p6.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse7);
+        }
+      });
+    }
+
+    void parse5() {
+      p5.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse6);
+        }
+      });
+    }
+
+    void parse4() {
+      p4.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse5);
+        }
+      });
+    }
+
+    void parse3() {
+      p3.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse4);
+        }
+      });
+    }
+
+    void parse2() {
+      p2.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          state.pos = pos;
+          onDone(null);
+        } else {
+          input.handle(parse3);
+        }
+      });
+    }
+
+    void parse() {
+      p1.parseAsync(state, (result) {
+        if (result == null) {
+          input.buffering--;
+          onDone(null);
+        } else {
+          input.handle(parse2);
+        }
+      });
+    }
+
+    parse();
   }
 }

@@ -29,8 +29,12 @@ ParseResult<I, R> createParseResult<I, O, R>(
   String? message;
   if (errorMessage != null) {
     message = errorMessage(input, offset, localized);
-  } else if (input is StringReader && input.source != null) {
-    message = _errorMessage(input.source!, offset, localized);
+  } else if (input is StringReader) {
+    if (input.source != null) {
+      message = _errorMessage(input.source!, offset, localized);
+    } else {
+      message = _errorMessage2(input, offset, localized);
+    }
   } else if (input is String) {
     message = _errorMessage(input, offset, localized);
   } else {
@@ -201,14 +205,19 @@ String _errorMessage(String input, int offset, List<ErrorMessage> errors) {
     final extraLen = lineLimit - errorLen;
     final rightLen = min(inputLen - end2, extraLen - (extraLen >> 1));
     final leftLen = min(start, max(0, lineLimit - errorLen - rightLen));
+    var index = start2 - 1;
     final list = <int>[];
-    final iterator = RuneIterator.at(input, start2);
-    for (var i = 0; i < leftLen; i++) {
-      if (!iterator.movePrevious()) {
-        break;
+    for (var i = 0; i < leftLen && index >= 0; i++) {
+      var cc = input.codeUnitAt(index--);
+      if ((cc & 0xFC00) == 0xDC00 && (index > 0)) {
+        final pc = input.codeUnitAt(index);
+        if ((pc & 0xFC00) == 0xD800) {
+          cc = 0x10000 + ((pc & 0x3FF) << 10) + (cc & 0x3FF);
+          index--;
+        }
       }
 
-      list.add(iterator.current);
+      list.add(cc);
     }
 
     final column = start - lineStart + 1;
@@ -224,6 +233,45 @@ String _errorMessage(String input, int offset, List<ErrorMessage> errors) {
     sb.writeln(text);
     sb.write(' ' * leftLen + '^' * indicatorLen);
   }
+
+  return sb.toString();
+}
+
+String _errorMessage2(
+    StringReader input, int offset, List<ErrorMessage> errors) {
+  final sb = StringBuffer();
+  final errorInfoList = errors
+      .map((e) => (length: e.length, message: e.toString()))
+      .toSet()
+      .toList();
+  for (var i = 0; i < errorInfoList.length; i++) {
+    int max(int x, int y) => x > y ? x : y;
+    int min(int x, int y) => x < y ? x : y;
+    if (sb.isNotEmpty) {
+      sb.writeln();
+      sb.writeln();
+    }
+
+    final errorInfo = errorInfoList[i];
+    final length = errorInfo.length;
+    final message = errorInfo.message;
+    final start = min(offset + length, offset);
+    final end = max(offset + length, offset);
+    final inputLen = input.length;
+    final lineLimit = min(80, inputLen);
+    final start2 = start;
+    final end2 = min(start2 + lineLimit, end);
+    final errorLen = end2 - start;
+    final indicatorLen = max(1, errorLen);
+    var text = input.substring(start, lineLimit);
+    text = text.replaceAll('\n', ' ');
+    text = text.replaceAll('\r', ' ');
+    text = text.replaceAll('\t', ' ');
+    sb.writeln('offset $offset: $message');
+    sb.writeln(text);
+    sb.write('^' * indicatorLen);
+  }
+
   return sb.toString();
 }
 

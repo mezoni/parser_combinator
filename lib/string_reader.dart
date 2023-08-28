@@ -110,7 +110,7 @@ class Utf8Reader implements StringReader {
   int get length => reader.length - _markerSize;
 
   @override
-  String? get source => throw UnimplementedError();
+  String? get source => null;
 
   @override
   int readChar(int index) {

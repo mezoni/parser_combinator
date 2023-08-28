@@ -16,7 +16,6 @@ import 'package:parser_combinator/parser/eof.dart';
 import 'package:parser_combinator/parser/expected.dart';
 import 'package:parser_combinator/parser/fast.dart';
 import 'package:parser_combinator/parser/has_match.dart';
-import 'package:parser_combinator/parser/integer.dart';
 import 'package:parser_combinator/parser/malformed.dart';
 import 'package:parser_combinator/parser/many.dart';
 import 'package:parser_combinator/parser/many1.dart';
@@ -24,6 +23,7 @@ import 'package:parser_combinator/parser/many_till.dart';
 import 'package:parser_combinator/parser/match.dart';
 import 'package:parser_combinator/parser/not.dart';
 import 'package:parser_combinator/parser/predicate.dart';
+import 'package:parser_combinator/parser/recognize.dart';
 import 'package:parser_combinator/parser/replace_all.dart';
 import 'package:parser_combinator/parser/satisfy.dart';
 import 'package:parser_combinator/parser/separated_list.dart';
@@ -63,13 +63,13 @@ void main() async {
   _testExpected();
   _testHasMatch();
   _testFast();
-  _testInteger(); // Not asynchronous
   _testMalformed();
   _testMany();
   _testMany1();
   _testManyTill();
   _testMatch1(); // Not asynchronous
   _testReplaceAll(); // Not asynchronous
+  _testRecognize();
   _testSatisfy();
   _testSeparatedList();
   _testSeparatedList1();
@@ -866,133 +866,6 @@ void _testHasMatch() {
   });
 }
 
-void _testInteger() {
-  test('Integer', () {
-    {
-      final p = Integer();
-      const source = '0';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '0');
-      expect(r2.result, true);
-      expect(r1.pos, 1);
-      expect(r2.pos, 1);
-    }
-
-    {
-      final p = Integer();
-      const source = '-0';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '-0');
-      expect(r2.result, true);
-      expect(r1.pos, 2);
-      expect(r2.pos, 2);
-    }
-
-    {
-      final p = Integer();
-      const source = '-01';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '-0');
-      expect(r2.result, true);
-      expect(r1.pos, 2);
-      expect(r2.pos, 2);
-    }
-
-    {
-      final p = Integer();
-      const source = '1';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '1');
-      expect(r2.result, true);
-      expect(r1.pos, 1);
-      expect(r2.pos, 1);
-    }
-
-    {
-      final p = Integer();
-      const source = '-1';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '-1');
-      expect(r2.result, true);
-      expect(r1.pos, 2);
-      expect(r2.pos, 2);
-    }
-
-    {
-      final p = Integer();
-      const source = '1234567890';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '1234567890');
-      expect(r2.result, true);
-      expect(r1.pos, 10);
-      expect(r2.pos, 10);
-    }
-
-    {
-      final p = Integer();
-      const source = '-1234567890';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, true);
-      expect(r1.result!.value, '-1234567890');
-      expect(r2.result, true);
-      expect(r1.pos, 11);
-      expect(r2.pos, 11);
-    }
-
-    {
-      final p = Integer();
-      const source = '';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, false);
-      expect(r2.result, false);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(_errorsToSet(r1), {ErrorUnexpectedEndOfInput.message});
-      expect(_errorsToSet(r2), {ErrorUnexpectedEndOfInput.message});
-    }
-
-    {
-      final p = Integer();
-      const source = 'a';
-      final input = StringReader(source);
-      final r1 = tryParse(p.parse, input);
-      final r2 = tryFastParse(p.fastParse, input);
-      expect(r1.result != null, false);
-      expect(r2.result, false);
-      expect(r1.pos, 0);
-      expect(r2.pos, 0);
-      expect(r1.failPos, 0);
-      expect(r2.failPos, 0);
-      expect(_errorsToSet(r1), {_errorUnexpectedCharacter(input, 0)});
-      expect(_errorsToSet(r2), {_errorUnexpectedCharacter(input, 0)});
-    }
-  });
-}
-
 void _testMalformed() {
   test('Malformed', () async {
     {
@@ -1283,6 +1156,49 @@ void _testMatch1() {
       expect(r2.failPos, 0);
       expect(_errorsToSet(r1), {_errorUnexpectedCharacter(input, 0)});
       expect(_errorsToSet(r2), {_errorUnexpectedCharacter(input, 0)});
+    }
+  });
+}
+
+void _testRecognize() {
+  test('Recognize', () async {
+    for (var i = 1; i < 10; i++) {
+      final charCodes = List.generate(i, (i) => i + 0x30);
+      final source = String.fromCharCodes(charCodes);
+      Parser<StringReader, String>? p;
+      switch (i) {
+        case 1:
+          p = Recognize(Tag('0'));
+          break;
+        case 2:
+          p = Recognize2(Tag('0'), Tag('1'));
+          break;
+        case 3:
+          p = Recognize3(Tag('0'), Tag('1'), Tag('2'));
+        case 4:
+          p = Recognize4(Tag('0'), Tag('1'), Tag('2'), Tag('3'));
+        case 5:
+          p = Recognize5(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'));
+        case 6:
+          p = Recognize6(
+              Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'), Tag('5'));
+        case 7:
+          p = Recognize7(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'),
+              Tag('5'), Tag('6'));
+        case 8:
+          p = Recognize8(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'),
+              Tag('5'), Tag('6'), Tag('7'));
+        case 9:
+          p = Recognize9(Tag('0'), Tag('1'), Tag('2'), Tag('3'), Tag('4'),
+              Tag('5'), Tag('6'), Tag('7'), Tag('8'));
+          break;
+        default:
+          throw UnimplementedError();
+      }
+
+      final pos = i;
+      final result = source;
+      await _testSuccess(p, source, pos: pos, result: result);
     }
   });
 }

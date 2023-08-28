@@ -1,5 +1,6 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
+import '../streaming.dart';
 
 class Ref<I, O> extends Parser<I, O> {
   final Parser<I, O> Function() f;
@@ -27,6 +28,12 @@ class Ref<I, O> extends Parser<I, O> {
     final p = f();
     return p.parse(state);
   }
+
+  @override
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+    final p = f();
+    p.parseAsync(state, onDone);
+  }
 }
 
 class _Ref<I, O> extends Parser<I, O> {
@@ -51,5 +58,10 @@ class _Ref<I, O> extends Parser<I, O> {
   @override
   Result<O>? parse(State<I> state) {
     return p!.parse(state);
+  }
+
+  @override
+  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+    p!.parseAsync(state, onDone);
   }
 }

@@ -1,10 +1,10 @@
 import '../parser/choice.dart';
 import '../parser/delimited.dart';
+import '../parser/digit.dart';
 import '../parser/digit1.dart';
 import '../parser/eof.dart';
 import '../parser/expected.dart';
 import '../parser/fast.dart';
-import '../parser/integer.dart';
 import '../parser/malformed.dart';
 import '../parser/map.dart';
 import '../parser/opt.dart';
@@ -12,8 +12,10 @@ import '../parser/preceded.dart';
 import '../parser/predicate.dart';
 import '../parser/recognize.dart';
 import '../parser/ref.dart';
+import '../parser/satisfy.dart';
 import '../parser/separated_list.dart';
 import '../parser/separated_pair.dart';
+import '../parser/sequence.dart';
 import '../parser/skip_while.dart';
 import '../parser/string_chars.dart';
 import '../parser/tag.dart';
@@ -22,6 +24,7 @@ import '../parser/take_while_m_n.dart';
 import '../parser/terminated.dart';
 import '../parser/tuple.dart';
 import '../parser/value.dart';
+import '../parser/wrapper.dart';
 import '../parser_combinator.dart';
 import '../parsing.dart';
 import '../runtime.dart';
@@ -36,6 +39,8 @@ void main(List<String> args) {
 const parser = Delimited(name: 'parser', _ws, _value, Eof());
 
 const _array = Delimited(name: '_array', _openBracket, _values, _closeBracket);
+
+const _arrayElement = Wrapper(name: '_arrayElement', _value);
 
 const _closeBrace = Terminated(name: '_closeBrace', Tag('}'), _ws);
 
@@ -68,10 +73,18 @@ const _hexValue = TakeWhileMN(name: '_hexValue', 4, 4, isHexDigit);
 const _hexValueChecked = Malformed(
     name: '_hexValueChecked', _hexValue, 'Expected 4 digit hexadecimal number');
 
-const _integer = Integer(name: '_integer');
+const _integer = Recognize2(
+    name: '_integer',
+    Opt(Tag('-')),
+    Choice2(
+      Tag('0'),
+      Sequence2(Satisfy(isDigit1_9), Digit()),
+    ));
 
 const _keyValue = Map1(
-    name: '_keyValue', SeparatedPair(_string, _colon, _value), createMapEntry);
+    name: '_keyValue',
+    SeparatedPair(_objectKey, _colon, _objectValue),
+    createMapEntry);
 
 const _keyValues = SeparatedList(name: '_keyValues', _keyValue, _comma);
 
@@ -97,6 +110,10 @@ const _object = Map1(
     name: '_object',
     Delimited(_openBrace, _keyValues, _closeBrace),
     Map.fromEntries);
+
+const _objectKey = Wrapper(name: '_objectKey', _string);
+
+const _objectValue = Wrapper(name: '_objectValue', _value);
 
 const _openBrace = Terminated(name: '_openBrace', Tag('{'), _ws);
 
@@ -135,7 +152,7 @@ const _value_ = Choice7(
   _true,
 );
 
-const _values = SeparatedList(name: '_values', _value, _comma);
+const _values = SeparatedList(name: '_values', _arrayElement, _comma);
 
 const _ws = SkipWhile(name: '_ws', isWhitespace);
 
@@ -148,6 +165,8 @@ String createStringFromHexValue(String s) {
 }
 
 Parser<StringReader, Object?> getValueParser() => _value_;
+
+bool isDigit1_9(int c) => c >= 0x31 && c <= 0x39;
 
 bool isNormalChar(int c) => c <= 91
     ? c <= 33

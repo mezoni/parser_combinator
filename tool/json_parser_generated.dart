@@ -173,6 +173,10 @@ bool _digit1(State<StringReader> state) {
 
 bool _tags0(State<StringReader> state) {
   const tags = ['-', '+'];
+  if (tags.isEmpty) {
+    throw ArgumentError.value(tags, 'tags', 'Must not be empty');
+  }
+
   final input = state.input;
   for (var i = 0; i < tags.length; i++) {
     final tag = tags[i];
@@ -193,6 +197,10 @@ bool _opt1(State<StringReader> state) {
 
 bool _tags1(State<StringReader> state) {
   const tags = ['E', 'e'];
+  if (tags.isEmpty) {
+    throw ArgumentError.value(tags, 'tags', 'Must not be empty');
+  }
+
   final input = state.input;
   for (var i = 0; i < tags.length; i++) {
     final tag = tags[i];
@@ -260,56 +268,106 @@ bool _opt2(State<StringReader> state) {
   return true;
 }
 
+bool _digit0(State<StringReader> state) {
+  final input = state.input;
+  while (state.pos < input.length) {
+    final c = input.readChar(state.pos);
+    if (!(c >= 0x30 && c <= 0x39)) {
+      break;
+    }
+
+    state.pos += input.count;
+  }
+
+  return true;
+}
+
+bool _satisfy0(State<StringReader> state) {
+  const f = _i1.isDigit1_9;
+  final input = state.input;
+  if (state.pos < input.length) {
+    final c = input.readChar(state.pos);
+    if (f(c)) {
+      state.pos += input.count;
+      return true;
+    }
+  }
+
+  state.fail<Object?>(ErrorUnexpectedCharacter());
+  return false;
+}
+
+bool _sequence2_0(State<StringReader> state) {
+  final pos = state.pos;
+  final r1 = _satisfy0(state);
+  if (r1) {
+    final r2 = _digit0(state);
+    if (r2) {
+      return true;
+    }
+  }
+
+  state.pos = pos;
+  return false;
+}
+
+bool _tag4(State<StringReader> state) {
+  const tag = '0';
+  final input = state.input;
+  final pos = state.pos;
+  if (input.startsWith(tag, pos)) {
+    state.pos += input.count;
+    return true;
+  }
+
+  state.fail<Object?>(ErrorExpectedTag(tag));
+  return false;
+}
+
+bool _choice2_0(State<StringReader> state) {
+  final r1 = _tag4(state);
+  if (r1) {
+    return r1;
+  }
+
+  final r2 = _sequence2_0(state);
+  if (r2) {
+    return r2;
+  }
+
+  return false;
+}
+
+bool _tag5(State<StringReader> state) {
+  const tag = '-';
+  final input = state.input;
+  final pos = state.pos;
+  if (input.startsWith(tag, pos)) {
+    state.pos += input.count;
+    return true;
+  }
+
+  state.fail<Object?>(ErrorExpectedTag(tag));
+  return false;
+}
+
+bool _opt3(State<StringReader> state) {
+  _tag5(state);
+  return true;
+}
+
 bool _integer(State<StringReader> state) {
   final pos = state.pos;
-  final input = state.input;
-  final length = input.length;
-  var ok = false;
-  int readChar() {
-    if (state.pos < length) {
-      return input.readChar(state.pos);
+  final r1 = _opt3(state);
+  if (r1) {
+    final r2 = _choice2_0(state);
+    if (r2) {
+      return true;
     }
-
-    return -1;
   }
 
-  while (true) {
-    var c = readChar();
-    if (c == 0x2d) {
-      state.pos += input.count;
-      c = readChar();
-    }
-
-    if (c == 0x30) {
-      state.pos += input.count;
-      ok = true;
-      break;
-    }
-
-    if (!(c >= 0x31 && c <= 0x39)) {
-      break;
-    }
-
-    ok = true;
-    state.pos += input.count;
-    while (true) {
-      c = readChar();
-      if (!(c >= 0x30 && c <= 0x39)) {
-        break;
-      }
-
-      state.pos += input.count;
-    }
-
-    break;
-  }
-
-  if (!ok) {
-    state.pos = pos;
-    state.fail<Object?>(const ErrorUnexpectedCharacter());
-  }
-
-  return ok;
+  state.pos = pos;
+  return false;
 }
 
 bool _fast3_0(State<StringReader> state) {
@@ -386,7 +444,7 @@ Result<num>? _number(State<StringReader> state) {
   return null;
 }
 
-bool _tag4(State<StringReader> state) {
+bool _tag6(State<StringReader> state) {
   const tag = '"';
   final input = state.input;
   final pos = state.pos;
@@ -399,7 +457,7 @@ bool _tag4(State<StringReader> state) {
   return false;
 }
 
-bool _tag5(State<StringReader> state) {
+bool _tag7(State<StringReader> state) {
   const tag = 'u';
   final input = state.input;
   final pos = state.pos;
@@ -467,7 +525,7 @@ Result<String>? _hexValueChecked(State<StringReader> state) {
 
 Result<String>? _preceded0(State<StringReader> state) {
   final pos = state.pos;
-  final r1 = _tag5(state);
+  final r1 = _tag7(state);
   if (r1) {
     final r2 = _hexValueChecked(state);
     if (r2 != null) {
@@ -524,7 +582,7 @@ Result<String>? _escape(State<StringReader> state) {
   return state.fail(const ErrorUnexpectedCharacter());
 }
 
-Result<String>? _choice2_0(State<StringReader> state) {
+Result<String>? _choice2_1(State<StringReader> state) {
   final r1 = _escape(state);
   if (r1 != null) {
     return r1;
@@ -570,7 +628,7 @@ Result<String>? _stringChars0(State<StringReader> state) {
     }
 
     state.pos += 1;
-    final r = _choice2_0(state);
+    final r = _choice2_1(state);
     if (r == null) {
       state.pos = pos;
       break;
@@ -592,7 +650,7 @@ Result<String>? _stringChars0(State<StringReader> state) {
 
 bool _doubleQuote(State<StringReader> state) {
   final pos = state.pos;
-  final r1 = _tag4(state);
+  final r1 = _tag6(state);
   if (r1) {
     final r2 = _ws(state);
     if (r2) {
@@ -607,7 +665,7 @@ bool _doubleQuote(State<StringReader> state) {
 
 Result<String>? _delimited0(State<StringReader> state) {
   final pos = state.pos;
-  final r1 = _tag4(state);
+  final r1 = _tag6(state);
   if (r1) {
     final r2 = _stringChars0(state);
     if (r2 != null) {
@@ -641,7 +699,7 @@ Result<String>? _string(State<StringReader> state) {
   return null;
 }
 
-bool _tag6(State<StringReader> state) {
+bool _tag8(State<StringReader> state) {
   const tag = '[';
   final input = state.input;
   final pos = state.pos;
@@ -656,7 +714,7 @@ bool _tag6(State<StringReader> state) {
 
 bool _openBracket(State<StringReader> state) {
   final pos = state.pos;
-  final r1 = _tag6(state);
+  final r1 = _tag8(state);
   if (r1) {
     final r2 = _ws(state);
     if (r2) {
@@ -669,7 +727,7 @@ bool _openBracket(State<StringReader> state) {
   return false;
 }
 
-bool _tag7(State<StringReader> state) {
+bool _tag9(State<StringReader> state) {
   const tag = ',';
   final input = state.input;
   final pos = state.pos;
@@ -684,7 +742,7 @@ bool _tag7(State<StringReader> state) {
 
 bool _comma(State<StringReader> state) {
   final pos = state.pos;
-  final r1 = _tag7(state);
+  final r1 = _tag9(state);
   if (r1) {
     final r2 = _ws(state);
     if (r2) {
@@ -697,8 +755,12 @@ bool _comma(State<StringReader> state) {
   return false;
 }
 
+Result<Object?>? _arrayElement(State<StringReader> state) {
+  return _value(state);
+}
+
 Result<List<Object?>>? _values(State<StringReader> state) {
-  final r1 = _value(state);
+  final r1 = _arrayElement(state);
   if (r1 == null) {
     return const Result([]);
   }
@@ -710,7 +772,7 @@ Result<List<Object?>>? _values(State<StringReader> state) {
       return Result(list);
     }
 
-    final r3 = _value(state);
+    final r3 = _arrayElement(state);
     if (r3 == null) {
       return null;
     }
@@ -719,7 +781,7 @@ Result<List<Object?>>? _values(State<StringReader> state) {
   }
 }
 
-bool _tag8(State<StringReader> state) {
+bool _tag10(State<StringReader> state) {
   const tag = ']';
   final input = state.input;
   final pos = state.pos;
@@ -734,7 +796,7 @@ bool _tag8(State<StringReader> state) {
 
 bool _closeBracket(State<StringReader> state) {
   final pos = state.pos;
-  final r1 = _tag8(state);
+  final r1 = _tag10(state);
   if (r1) {
     final r2 = _ws(state);
     if (r2) {
@@ -764,7 +826,7 @@ Result<List<Object?>>? _array(State<StringReader> state) {
   return null;
 }
 
-bool _tag9(State<StringReader> state) {
+bool _tag11(State<StringReader> state) {
   const tag = '{';
   final input = state.input;
   final pos = state.pos;
@@ -779,7 +841,7 @@ bool _tag9(State<StringReader> state) {
 
 bool _openBrace(State<StringReader> state) {
   final pos = state.pos;
-  final r1 = _tag9(state);
+  final r1 = _tag11(state);
   if (r1) {
     final r2 = _ws(state);
     if (r2) {
@@ -792,7 +854,7 @@ bool _openBrace(State<StringReader> state) {
   return false;
 }
 
-bool _tag10(State<StringReader> state) {
+bool _tag12(State<StringReader> state) {
   const tag = ':';
   final input = state.input;
   final pos = state.pos;
@@ -807,7 +869,7 @@ bool _tag10(State<StringReader> state) {
 
 bool _colon(State<StringReader> state) {
   final pos = state.pos;
-  final r1 = _tag10(state);
+  final r1 = _tag12(state);
   if (r1) {
     final r2 = _ws(state);
     if (r2) {
@@ -820,13 +882,21 @@ bool _colon(State<StringReader> state) {
   return false;
 }
 
+Result<Object?>? _objectValue(State<StringReader> state) {
+  return _value(state);
+}
+
+Result<String>? _objectKey(State<StringReader> state) {
+  return _string(state);
+}
+
 Result<(String, Object?)>? _separatedPair0(State<StringReader> state) {
   final pos = state.pos;
-  final r1 = _string(state);
+  final r1 = _objectKey(state);
   if (r1 != null) {
     final r2 = _colon(state);
     if (r2) {
-      final r3 = _value(state);
+      final r3 = _objectValue(state);
       if (r3 != null) {
         return Result((r1.value, r3.value));
       }
@@ -870,7 +940,7 @@ Result<List<MapEntry<String, Object?>>>? _keyValues(State<StringReader> state) {
   }
 }
 
-bool _tag11(State<StringReader> state) {
+bool _tag13(State<StringReader> state) {
   const tag = '}';
   final input = state.input;
   final pos = state.pos;
@@ -885,7 +955,7 @@ bool _tag11(State<StringReader> state) {
 
 bool _closeBrace(State<StringReader> state) {
   final pos = state.pos;
-  final r1 = _tag11(state);
+  final r1 = _tag13(state);
   if (r1) {
     final r2 = _ws(state);
     if (r2) {
