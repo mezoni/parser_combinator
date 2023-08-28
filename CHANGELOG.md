@@ -1,3 +1,7 @@
+## 0.2.8
+
+- Minor changes in `Utf8Reader`.
+
 ## 0.2.7
 
 - Minor changes in the JSON parser.

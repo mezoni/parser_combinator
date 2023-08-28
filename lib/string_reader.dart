@@ -118,26 +118,18 @@ class Utf8Reader implements StringReader {
       throw ArgumentError.value(index, 'index', 'Must not be negative');
     }
 
-    if (_lastIndex == index) {
-      return _char;
-    }
-
     final c = _read(index);
-    _lastIndex = index;
-    _char = c;
     return c;
   }
 
   @override
   bool startsWith(String string, [int index = 0]) {
-    _lastIndex = -1;
     var readDataSize = 0;
     final iterator = string.runes.iterator;
     while (iterator.moveNext()) {
       final c1 = iterator.current;
       final c2 = _read(index);
       if (c1 != c2) {
-        _readDataSize = 0;
         return false;
       }
 
@@ -145,6 +137,7 @@ class Utf8Reader implements StringReader {
       readDataSize += _readDataSize;
     }
 
+    _lastIndex = -1;
     _readDataSize = readDataSize;
     return true;
   }
@@ -155,7 +148,6 @@ class Utf8Reader implements StringReader {
       throw RangeError.range(start, 0, end, 'start');
     }
 
-    _lastIndex = -1;
     var index = start;
     var readDataSize = 0;
     if (end != null) {
@@ -164,6 +156,7 @@ class Utf8Reader implements StringReader {
       }
 
       if (end - start == 0) {
+        _lastIndex = -1;
         _readDataSize = 0;
         return '';
       }
@@ -178,8 +171,7 @@ class Utf8Reader implements StringReader {
       readDataSize += _readDataSize;
     }
 
-    _lastIndex = start;
-    _char = charCodes[0];
+    _lastIndex = -1;
     _readDataSize = readDataSize;
     return String.fromCharCodes(charCodes);
   }
@@ -203,11 +195,15 @@ class Utf8Reader implements StringReader {
   }
 
   int _read(int index) {
+    if (_lastIndex == index) {
+      return _char;
+    }
+
     final byte1 = _readByte(index + _markerSize);
     var c = 0;
     if (byte1 < 0x80) {
       _readDataSize = 1;
-      return byte1;
+      c = byte1;
     } else if ((byte1 & 0xe0) == 0xc0) {
       _readDataSize = 2;
       final byte2 = _readByte(index + _markerSize + 1);
@@ -234,6 +230,8 @@ class Utf8Reader implements StringReader {
       _error(index, c);
     }
 
+    _lastIndex = index;
+    _char = c;
     return c;
   }
 
