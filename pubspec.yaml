@@ -1,7 +1,7 @@
 name: parser_combinator
 description: Parser combinator is a collection of parsers that can be used to combine basic parsers to create parsers for more complex rules.
 repository: https://github.com/mezoni/parser_combinator
-version: 0.2.8
+version: 0.2.9
 topics:
   - parser
   - parser-combinator

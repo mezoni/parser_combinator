@@ -20,6 +20,7 @@ import 'package:parser_combinator/parser/malformed.dart';
 import 'package:parser_combinator/parser/many.dart';
 import 'package:parser_combinator/parser/many1.dart';
 import 'package:parser_combinator/parser/many_till.dart';
+import 'package:parser_combinator/parser/map.dart';
 import 'package:parser_combinator/parser/match.dart';
 import 'package:parser_combinator/parser/not.dart';
 import 'package:parser_combinator/parser/predicate.dart';
@@ -34,6 +35,7 @@ import 'package:parser_combinator/parser/sequence.dart';
 import 'package:parser_combinator/parser/skip_while.dart';
 import 'package:parser_combinator/parser/skip_while1.dart';
 import 'package:parser_combinator/parser/skip_while_m_n.dart';
+import 'package:parser_combinator/parser/string_chars.dart';
 import 'package:parser_combinator/parser/tag.dart';
 import 'package:parser_combinator/parser/tags.dart';
 import 'package:parser_combinator/parser/take_while.dart';
@@ -79,6 +81,7 @@ void main() async {
   _testSkipWhile();
   _testSkipWhile1();
   //_testSkipWhileMN();
+  //_testStringChars();
   _testTag();
   _testTags();
   _testTakeWhile();
@@ -1827,6 +1830,90 @@ void _testSkipWhileMN() {
         _errorUnexpectedCharacter(input, failPos),
       };
       await _testFailure(p, source, failPos: failPos, pos: pos, errors: errors);
+    }
+  });
+}
+
+void _testStringChars() {
+  test('StringChars', () async {
+    {
+      final p = StringChars(isAlpha, 0x92, Map1(Tag('n'), (e) => '\n'));
+      const source = 'a';
+      const pos = 1;
+      const result = 'a';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = StringChars(isAlpha, 0x92, Map1(Tag('n'), (e) => '\n'));
+      const source = 'ab';
+      const pos = 2;
+      const result = 'ab';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = StringChars(isAlpha, 0x92, Map1(Tag('n'), (e) => '\n'));
+      const source = 'a\n';
+      const pos = 2;
+      const result = 'a\n';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = StringChars(isAlpha, 0x92, Map1(Tag('n'), (e) => '\n'));
+      const source = '\na\n';
+      const pos = 3;
+      const result = '\na\n';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = StringChars(isAlpha, 0x92, Map1(Tag('n'), (e) => '\n'));
+      const source = '\n\na\n';
+      const pos = 4;
+      const result = '\n\na\n';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = StringChars(isAlpha, 0x92, Map1(Tag('n'), (e) => '\n'));
+      const source = '\n\na\n\n';
+      const pos = 5;
+      const result = '\n\na\n\n';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = StringChars(isAlpha, 0x92, Map1(Tag('n'), (e) => '\n'));
+      const source = '\na\nb\nc\n';
+      const pos = 7;
+      const result = '\na\nb\nc\n';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = StringChars(isAlpha, 0x92, Map1(Tag('n'), (e) => '\n'));
+      const source = '';
+      const pos = 0;
+      const result = '';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = StringChars(isAlpha, 0x92, Map1(Tag('n'), (e) => '\n'));
+      const source = '\n';
+      const pos = 1;
+      const result = '\n';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = StringChars(isAlpha, 0x92, Map1(Tag('n'), (e) => '\n'));
+      const source = '\n\n';
+      const pos = 2;
+      const result = '\n\n';
+      await _testSuccess(p, source, pos: pos, result: result);
     }
   });
 }
