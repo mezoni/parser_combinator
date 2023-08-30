@@ -58,6 +58,7 @@ void main() async {
   _testBuffered();
   _testCalc();
   _testChar();
+  //_testChainL();
   _testChoice();
   _testDelimited();
   _testDigit();
@@ -70,10 +71,18 @@ void main() async {
   _testMany();
   _testMany1();
   //_testManyTill();
+  //_testMap();
   _testMatch1(); // Not asynchronous
+  //_testNot();
+  //_testOneOf();
   _testOpt();
+  //_testPosition();
+  //_testPreceded();
+  //_testProc();
   _testReplaceAll(); // Not asynchronous
   _testRecognize();
+  //_testRef();
+  //_testRest();
   _testSatisfy();
   _testSeparatedList();
   _testSeparatedList1();
@@ -89,6 +98,10 @@ void main() async {
   _testTakeWhile();
   _testTakeWhile1();
   //_testTakeWhileMN();
+  //_testTerminated();
+  //_testValue();
+  //_testValueP();
+  //_testVerify();
 }
 
 String _errorExpectedCharacter(int char) =>
