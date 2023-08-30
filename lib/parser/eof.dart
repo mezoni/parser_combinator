@@ -30,32 +30,40 @@ class Eof extends Parser<StringReader, Object?> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<Object?> onDone) {
+  AsyncResult<Object?> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<Object?>();
     if (!backtrack(state)) {
-      onDone(null);
-      return;
+      result.ok = false;
+      return result;
     }
 
     final input = state.input;
+    final end = input.end;
+    if (state.pos < end) {
+      state.fail<Object?>(const ErrorExpectedEndOfInput());
+      result.ok = false;
+      input.handler = result.handler;
+      return result;
+    }
+
     void parse() {
       final end = input.end;
       if (state.pos >= end && !input.isClosed) {
         input.sleep = true;
-        input.handle(parse);
+        input.handler = parse;
         return;
       }
 
-      if (state.pos >= end) {
-        onDone(Result(null));
+      if (result.ok = state.pos >= end) {
+        result.value = const Result<Object?>(null);
       } else {
         state.fail<Object?>(const ErrorExpectedEndOfInput());
-        onDone(null);
       }
 
-      return;
+      input.handler = result.handler;
     }
 
     parse();
+    return result;
   }
 }

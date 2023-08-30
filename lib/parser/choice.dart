@@ -49,25 +49,55 @@ class Choice2<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O>();
     final input = state.input;
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        onDone(result);
-      });
-    }
-
+    late AsyncResult<O> r1;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse2);
-        } else {
-          onDone(result);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p2.parseAsync(state);
+            action = 2;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if ((result.ok = r1.ok) == true) {
+              result.value = r1.value;
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -131,35 +161,71 @@ class Choice3<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O>();
     final input = state.input;
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        onDone(result);
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse3);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
+    late AsyncResult<O> r1;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse2);
-        } else {
-          onDone(result);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p2.parseAsync(state);
+            action = 2;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p3.parseAsync(state);
+            action = 3;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if ((result.ok = r1.ok) == true) {
+              result.value = r1.value;
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -237,45 +303,87 @@ class Choice4<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O>();
     final input = state.input;
-    void parse4() {
-      p4.parseAsync(state, (result) {
-        onDone(result);
-      });
-    }
-
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse4);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse3);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
+    late AsyncResult<O> r1;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse2);
-        } else {
-          onDone(result);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p2.parseAsync(state);
+            action = 2;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p3.parseAsync(state);
+            action = 3;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p4.parseAsync(state);
+            action = 4;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 4:
+            if ((result.ok = r1.ok) == true) {
+              result.value = r1.value;
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -366,55 +474,103 @@ class Choice5<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O>();
     final input = state.input;
-    void parse5() {
-      p5.parseAsync(state, (result) {
-        onDone(result);
-      });
-    }
-
-    void parse4() {
-      p4.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse5);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse4);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse3);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
+    late AsyncResult<O> r1;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse2);
-        } else {
-          onDone(result);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p2.parseAsync(state);
+            action = 2;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p3.parseAsync(state);
+            action = 3;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p4.parseAsync(state);
+            action = 4;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 4:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p5.parseAsync(state);
+            action = 5;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 5:
+            if ((result.ok = r1.ok) == true) {
+              result.value = r1.value;
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -519,65 +675,119 @@ class Choice6<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O>();
     final input = state.input;
-    void parse6() {
-      p6.parseAsync(state, (result) {
-        onDone(result);
-      });
-    }
-
-    void parse5() {
-      p5.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse6);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse4() {
-      p4.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse5);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse4);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse3);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
+    late AsyncResult<O> r1;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse2);
-        } else {
-          onDone(result);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p2.parseAsync(state);
+            action = 2;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p3.parseAsync(state);
+            action = 3;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p4.parseAsync(state);
+            action = 4;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 4:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p5.parseAsync(state);
+            action = 5;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 5:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p6.parseAsync(state);
+            action = 6;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 6:
+            if ((result.ok = r1.ok) == true) {
+              result.value = r1.value;
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -695,75 +905,135 @@ class Choice7<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O>();
     final input = state.input;
-    void parse7() {
-      p7.parseAsync(state, (result) {
-        onDone(result);
-      });
-    }
-
-    void parse6() {
-      p6.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse7);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse5() {
-      p5.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse6);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse4() {
-      p4.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse5);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse4);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse3);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
+    late AsyncResult<O> r1;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse2);
-        } else {
-          onDone(result);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p2.parseAsync(state);
+            action = 2;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p3.parseAsync(state);
+            action = 3;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p4.parseAsync(state);
+            action = 4;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 4:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p5.parseAsync(state);
+            action = 5;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 5:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p6.parseAsync(state);
+            action = 6;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 6:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p7.parseAsync(state);
+            action = 7;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 7:
+            if ((result.ok = r1.ok) == true) {
+              result.value = r1.value;
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -895,85 +1165,151 @@ class Choice8<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O>();
     final input = state.input;
-    void parse8() {
-      p8.parseAsync(state, (result) {
-        onDone(result);
-      });
-    }
-
-    void parse7() {
-      p7.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse8);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse6() {
-      p6.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse7);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse5() {
-      p5.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse6);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse4() {
-      p4.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse5);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse4);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse3);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
+    late AsyncResult<O> r1;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse2);
-        } else {
-          onDone(result);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p2.parseAsync(state);
+            action = 2;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p3.parseAsync(state);
+            action = 3;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p4.parseAsync(state);
+            action = 4;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 4:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p5.parseAsync(state);
+            action = 5;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 5:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p6.parseAsync(state);
+            action = 6;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 6:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p7.parseAsync(state);
+            action = 7;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 7:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p8.parseAsync(state);
+            action = 8;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 8:
+            if ((result.ok = r1.ok) == true) {
+              result.value = r1.value;
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -1118,94 +1454,166 @@ class Choice9<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O>();
     final input = state.input;
-    void parse9() {
-      p9.parseAsync(state, (result) {
-        onDone(result);
-      });
-    }
-
-    void parse8() {
-      p8.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse9);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse7() {
-      p7.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse8);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse6() {
-      p6.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse7);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse5() {
-      p5.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse6);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse4() {
-      p4.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse5);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse4);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse3);
-        } else {
-          onDone(result);
-        }
-      });
-    }
-
+    late AsyncResult<O> r1;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.handle(parse2);
-        } else {
-          onDone(result);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p2.parseAsync(state);
+            action = 2;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p3.parseAsync(state);
+            action = 3;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p4.parseAsync(state);
+            action = 4;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 4:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p5.parseAsync(state);
+            action = 5;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 5:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p6.parseAsync(state);
+            action = 6;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 6:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p7.parseAsync(state);
+            action = 7;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 7:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p8.parseAsync(state);
+            action = 8;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 8:
+            if (r1.ok == true) {
+              result.value = r1.value;
+              result.ok = true;
+              input.handler = result.handler;
+              return;
+            }
+
+            r1 = p9.parseAsync(state);
+            action = 9;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 9:
+            if ((result.ok = r1.ok) == true) {
+              result.value = r1.value;
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }

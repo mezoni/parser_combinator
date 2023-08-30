@@ -2,8 +2,8 @@ import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
 
-class And<I, O1> extends Parser<I, Object?> {
-  final Parser<I, O1> p;
+class And<I, O> extends Parser<I, Object?> {
+  final Parser<I, O> p;
 
   const And(this.p, {String? name}) : super(name);
 
@@ -37,19 +37,25 @@ class And<I, O1> extends Parser<I, Object?> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<Object?> onDone) {
+  AsyncResult<Object?> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<Object?>();
     final pos = state.pos;
-    void parse() {
-      p.parseAsync(state, (result) {
-        if (result == null) {
-          onDone(null);
-        } else {
-          state.pos = pos;
-          onDone(Result(null));
-        }
-      });
+    final r1 = p.parseAsync(state);
+    void handle() {
+      if ((result.ok = r1.ok) == true) {
+        state.pos = pos;
+        result.value = const Result<Object?>(null);
+      }
+
+      state.input.handler = result.handler;
     }
 
-    parse();
+    if (r1.ok != null) {
+      handle();
+    } else {
+      r1.handler = handle;
+    }
+
+    return result;
   }
 }

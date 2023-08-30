@@ -38,18 +38,39 @@ class Map1<I, O1, O2> extends Parser<I, O2> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O2> onDone) {
+  AsyncResult<O2> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O2>();
+    late AsyncResult<O1> r1;
+    var action = 0;
     void parse() {
-      p.parseAsync(state, (result) {
-        if (result == null) {
-          onDone(null);
-        } else {
-          final v = f(result.value);
-          onDone(Result(v));
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if ((result.ok = r1.ok) == true) {
+              final v1 = r1.value!.value;
+              final v2 = f(v1);
+              result.value = Result(v2);
+            }
+
+            state.input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }

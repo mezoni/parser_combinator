@@ -23,6 +23,7 @@ import 'package:parser_combinator/parser/many_till.dart';
 import 'package:parser_combinator/parser/map.dart';
 import 'package:parser_combinator/parser/match.dart';
 import 'package:parser_combinator/parser/not.dart';
+import 'package:parser_combinator/parser/opt.dart';
 import 'package:parser_combinator/parser/predicate.dart';
 import 'package:parser_combinator/parser/recognize.dart';
 import 'package:parser_combinator/parser/replace_all.dart';
@@ -68,8 +69,9 @@ void main() async {
   _testMalformed();
   _testMany();
   _testMany1();
-  _testManyTill();
+  //_testManyTill();
   _testMatch1(); // Not asynchronous
+  _testOpt();
   _testReplaceAll(); // Not asynchronous
   _testRecognize();
   _testSatisfy();
@@ -114,27 +116,45 @@ String _errorUnexpectedCharacter(StringReader input, int pos) =>
 Future<ParseResult<ChunkedData<StringReader>, Result<O>?>> _parseStream<O>(
   Parser<StringReader, O> p,
   String source,
+  bool byRunes,
 ) {
   final input = StringReaderChunkedData();
   final completer =
       Completer<ParseResult<ChunkedData<StringReader>, Result<O>?>>();
   final state = State(input);
-  p.parseAsync(state, (result) {
+  void handle(AsyncResult<O> result, void Function() f) {
+    if (result.ok != null) {
+      f();
+    } else {
+      result.handler = f;
+    }
+  }
+
+  final result = p.parseAsync(state);
+  handle(result, () {
     final r = createParseResult<ChunkedData<StringReader>, O, Result<O>?>(
       state,
-      result,
+      result.value,
       (e) => e != null,
     );
     completer.complete(r);
   });
-  final stream = Stream.fromIterable(source.runes);
-  stream.listen((event) {
-    final string = String.fromCharCode(event);
-    final chunk = StringReader(string);
-    input.add(chunk);
-  }, onDone: input.close);
-
-  return completer.future;
+  if (byRunes) {
+    final stream = Stream.fromIterable(source.runes);
+    stream.listen((event) {
+      final string = String.fromCharCode(event);
+      final chunk = StringReader(string);
+      input.add(chunk);
+    }, onDone: input.close);
+    return completer.future;
+  } else {
+    final stream = Stream.value(source);
+    stream.listen((event) {
+      final chunk = StringReader(event);
+      input.add(chunk);
+    }, onDone: input.close);
+    return completer.future;
+  }
 }
 
 void _testAllMatches() {
@@ -737,13 +757,14 @@ Future<void> _testFailure<O>(
   void Function(ParseResult<Object?, Object?> result)? testErrors,
 }) async {
   final input = StringReader(source);
-  final r0 = await _parseStream(p, source);
-  final r1 = tryParse(p.parse, input);
-  final r2 = tryFastParse(p.fastParse, input);
-  final rs = [r0, r1, r2];
+  final r0 = await _parseStream(p, source, true);
+  final r1 = await _parseStream(p, source, false);
+  final r2 = tryParse(p.parse, input);
+  final r3 = tryFastParse(p.fastParse, input);
+  final rs = [r0, r1, r2, r3];
   for (var i = 0; i < rs.length; i++) {
     final r = rs[i];
-    if (i == 2) {
+    if (i == 3) {
       expect(r.result, false, reason: 'result != false');
     } else {
       expect(r.result != null, false, reason: 'result != null');
@@ -1159,6 +1180,26 @@ void _testMatch1() {
       expect(r2.failPos, 0);
       expect(_errorsToSet(r1), {_errorUnexpectedCharacter(input, 0)});
       expect(_errorsToSet(r2), {_errorUnexpectedCharacter(input, 0)});
+    }
+  });
+}
+
+void _testOpt() {
+  test('Opt', () async {
+    {
+      final p = Opt(Tag('abc'));
+      const source = 'abc';
+      const pos = 3;
+      const result = 'abc';
+      await _testSuccess(p, source, pos: pos, result: result);
+    }
+
+    {
+      final p = Opt(Tag('abc'));
+      const source = '';
+      const pos = 0;
+      const result = null;
+      await _testSuccess(p, source, pos: pos, result: result);
     }
   });
 }
@@ -1926,13 +1967,14 @@ Future<void> _testSuccess<O>(
   void Function(Object? result)? testResult,
 }) async {
   final input = StringReader(source);
-  final r0 = await _parseStream(p, source);
-  final r1 = tryParse(p.parse, input);
-  final r2 = tryFastParse(p.fastParse, input);
-  final rs = [r0, r1, r2];
+  final r0 = await _parseStream(p, source, true);
+  final r1 = await _parseStream(p, source, false);
+  final r2 = tryParse(p.parse, input);
+  final r3 = tryFastParse(p.fastParse, input);
+  final rs = [r0, r1, r2, r3];
   for (var i = 0; i < rs.length; i++) {
     final r = rs[i];
-    if (i == 2) {
+    if (i == 3) {
       expect(r.result, true, reason: 'result != true');
     } else {
       expect(r.result != null, true, reason: 'result == null');

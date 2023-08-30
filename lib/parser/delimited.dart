@@ -54,43 +54,74 @@ class Delimited<I, O1, O2, O3> extends Parser<I, O2> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O2> onDone) {
+  AsyncResult<O2> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O2>();
     final input = state.input;
     final pos = state.pos;
-    Result<O2>? r;
-    void parse3() {
-      end.parseAsync(state, (result) {
-        if (result == null) {
-          state.pos = pos;
-          onDone(null);
-        } else {
-          onDone(r);
-        }
-      });
-    }
-
-    void parse2() {
-      p.parseAsync(state, (result) {
-        if (result == null) {
-          state.pos = pos;
-          onDone(null);
-        } else {
-          r = result;
-          input.handle(parse3);
-        }
-      });
-    }
-
+    late AsyncResult<O1> r1;
+    late AsyncResult<O2> r2;
+    late AsyncResult<O3> r3;
+    var action = 0;
     void parse() {
-      start.parseAsync(state, (result) {
-        if (result == null) {
-          onDone(null);
-        } else {
-          input.handle(parse2);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = start.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == false) {
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r2 = p.parseAsync(state);
+            action = 2;
+            if (r2.ok == null) {
+              r2.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r2.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r3 = end.parseAsync(state);
+            action = 3;
+            if (r3.ok == null) {
+              r3.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if ((result.ok = r3.ok) == false) {
+              state.pos = pos;
+            } else {
+              result.value = r2.value;
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }

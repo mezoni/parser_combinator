@@ -30,9 +30,9 @@ class Ref<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
     final p = f();
-    p.parseAsync(state, onDone);
+    return p.parseAsync(state);
   }
 }
 
@@ -61,7 +61,7 @@ class _Ref<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
-    p!.parseAsync(state, onDone);
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    return p!.parseAsync(state);
   }
 }

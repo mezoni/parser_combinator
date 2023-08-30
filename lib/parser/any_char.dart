@@ -36,11 +36,11 @@ class AnyChar extends Parser<StringReader, int> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<int> onDone) {
+  AsyncResult<int> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<int>();
     if (!backtrack(state)) {
-      onDone(null);
-      return;
+      result.ok = false;
+      return result;
     }
 
     final input = state.input;
@@ -49,7 +49,7 @@ class AnyChar extends Parser<StringReader, int> {
       final end = input.end;
       if (state.pos >= end && !input.isClosed) {
         input.sleep = true;
-        input.handle(parse);
+        input.handler = parse;
         return;
       }
 
@@ -59,14 +59,18 @@ class AnyChar extends Parser<StringReader, int> {
         final source = data.source!;
         final c = source.runeAt(state.pos - input.start);
         state.pos += c > 0xffff ? 2 : 1;
-        onDone(Result(c));
+        result.value = Result(c);
+        result.ok = true;
+        input.handler = result.handler;
         return;
       }
 
+      result.ok = false;
       state.fail<Object?>(const ErrorUnexpectedEndOfInput());
-      onDone(null);
+      input.handler = result.handler;
     }
 
     parse();
+    return result;
   }
 }

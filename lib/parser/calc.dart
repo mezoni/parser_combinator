@@ -25,8 +25,11 @@ class Calc<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
     final v = f();
-    onDone(Result(v));
+    final result = AsyncResult<O>();
+    result.value = Result(v);
+    result.ok = true;
+    return result;
   }
 }

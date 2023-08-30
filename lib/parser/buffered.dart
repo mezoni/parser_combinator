@@ -23,16 +23,38 @@ class Buffered<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O>();
     final input = state.input;
+    late AsyncResult<O> r1;
+    var action = 0;
+    input.buffering++;
     void parse() {
-      input.buffering++;
-      p.parseAsync(state, (result) {
-        input.buffering--;
-        onDone(result);
-      });
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            input.buffering--;
+            result.value = r1.value;
+            result.ok = r1.ok;
+            state.input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
+        }
+      }
     }
 
     parse();
+    return result;
   }
 }

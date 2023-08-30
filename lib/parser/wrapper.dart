@@ -23,13 +23,7 @@ class Wrapper<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
-    void parse() {
-      p.parseAsync(state, (result) {
-        onDone(result);
-      });
-    }
-
-    parse();
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    return p.parseAsync(state);
   }
 }

@@ -29,17 +29,21 @@ class Opt<I, O> extends Parser<I, O?> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O?> onDone) {
-    void parse() {
-      p.parseAsync(state, (result) {
-        if (result == null) {
-          onDone(Result(null));
-        } else {
-          onDone(result);
-        }
-      });
+  AsyncResult<O?> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O?>();
+    final r1 = p.parseAsync(state);
+    void handle() {
+      result.ok = true;
+      result.value = r1.ok == true ? r1.value : const Result(null);
+      state.input.handler = result.handler;
     }
 
-    parse();
+    if (r1.ok != null) {
+      handle();
+    } else {
+      r1.handler = handle;
+    }
+
+    return result;
   }
 }

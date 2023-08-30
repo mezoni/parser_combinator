@@ -54,46 +54,77 @@ class SeparatedPair<I, O1, O2, O3> extends Parser<I, (O1, O3)> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<I>> state, ResultCallback<(O1, O3)> onDone) {
+  AsyncResult<(O1, O3)> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<(O1, O3)>();
     final input = state.input;
     final pos = state.pos;
-    Result<O1>? r1;
-    Result<O3>? r3;
-    void parse3() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          state.pos = pos;
-          onDone(null);
-        } else {
-          r3 = result;
-          onDone(Result((r1!.value, r3!.value)));
-        }
-      });
-    }
-
-    void parse2() {
-      sep.parseAsync(state, (result) {
-        if (result == null) {
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse3);
-        }
-      });
-    }
-
+    late AsyncResult<O1> r1;
+    late AsyncResult<O2> r2;
+    late AsyncResult<O3> r3;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          onDone(null);
-        } else {
-          r1 = result;
-          input.handle(parse2);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == false) {
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r2 = sep.parseAsync(state);
+            action = 2;
+            if (r2.ok == null) {
+              r2.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r2.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r3 = p2.parseAsync(state);
+            action = 3;
+            if (r3.ok == null) {
+              r3.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if ((result.ok = r3.ok) == false) {
+              state.pos = pos;
+            } else {
+              result.value = Result((
+                r1.value!.value,
+                r3.value!.value,
+              ));
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }

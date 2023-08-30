@@ -23,8 +23,11 @@ class Value<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
-    onDone(Result(value));
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O>();
+    result.value = Result(value);
+    result.ok = true;
+    return result;
   }
 }
 
@@ -56,17 +59,23 @@ class ValueP<I, O1, O2> extends Parser<I, O2> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O2> onDone) {
-    void parse() {
-      p.parseAsync(state, (result) {
-        if (result == null) {
-          onDone(null);
-        } else {
-          onDone(Result(value));
-        }
-      });
+  AsyncResult<O2> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O2>();
+    final r1 = p.parseAsync(state);
+    void handle() {
+      if ((result.ok = r1.ok) == true) {
+        result.value = Result(value);
+      }
+
+      state.input.handler = result.handler;
     }
 
-    parse();
+    if (r1.ok != null) {
+      handle();
+    } else {
+      r1.handler = handle;
+    }
+
+    return result;
   }
 }

@@ -53,26 +53,46 @@ class Expected<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O>();
+    late AsyncResult<O> r1;
     final failPos = state.failPos;
     final errorCount = state.errorCount;
+    var action = 0;
     void parse() {
-      p.parseAsync(state, (result) {
-        if (result != null) {
-          onDone(result);
-        } else {
-          if (state.canHandleError(failPos, errorCount)) {
-            if (state.pos == state.failPos) {
-              state.clearErrors(failPos, errorCount);
-              state.fail<Object?>(ErrorExpectedTag(tag));
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
             }
-          }
 
-          onDone(null);
+            break;
+          case 1:
+            if ((result.ok = r1.ok) == true) {
+              result.value = r1.value;
+            } else {
+              if (state.canHandleError(failPos, errorCount)) {
+                if (state.pos == state.failPos) {
+                  state.clearErrors(failPos, errorCount);
+                  state.fail<Object?>(ErrorExpectedTag(tag));
+                }
+              }
+            }
+
+            state.input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }

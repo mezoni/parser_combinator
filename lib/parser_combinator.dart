@@ -3,9 +3,35 @@ import 'streaming.dart';
 
 typedef Predicate<T> = bool Function(T);
 
-typedef ResultCallback<T> = void Function(Result<T>? result);
-
 typedef VoidCallback1<T> = void Function(T result);
+
+class AsyncResult<T> {
+  bool? ok;
+
+  Result<T>? value;
+
+  void Function()? _handler;
+
+  void Function()? get handler => _handler;
+
+  set handler(void Function()? handler) {
+    if (handler == null) {
+      _handler = null;
+    } else {
+      if (_handler == null) {
+        _handler = handler;
+      } else {
+        final f = _handler;
+        _handler = () {
+          handler();
+          if (f != null) {
+            f();
+          }
+        };
+      }
+    }
+  }
+}
 
 abstract class Parser<I, O> {
   final String? name;
@@ -35,7 +61,7 @@ abstract class Parser<I, O> {
 
   Result<O>? parse(State<I> state);
 
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
     throw UnimplementedError();
   }
 

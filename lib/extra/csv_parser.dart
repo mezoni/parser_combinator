@@ -44,7 +44,7 @@ const _rows =
 
 const _string = Malformed(
     Map1(Delimited(_openQuote, _chars, _closeQuote), String.fromCharCodes),
-    'Untermnated string');
+    'Unterminated string');
 
 const _text = TakeWhile(name: '_text', isTextChar);
 

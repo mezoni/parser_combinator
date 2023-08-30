@@ -48,20 +48,43 @@ class Many<I, O> extends Parser<I, List<O>> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<List<O>> onDone) {
-    final input = state.input;
+  AsyncResult<List<O>> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<List<O>>();
+    late AsyncResult<O> r1;
     final list = <O>[];
+    var action = 0;
     void parse() {
-      p.parseAsync(state, (result) {
-        if (result == null) {
-          onDone(Result(list));
-        } else {
-          list.add(result.value);
-          input.handle(parse);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            final r = r1.value;
+            if (r == null) {
+              result.value = Result(list);
+              result.ok = true;
+              state.input.handler = result.handler;
+              action = -1;
+              return;
+            }
+
+            list.add(r.value);
+            action = 0;
+            break;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }

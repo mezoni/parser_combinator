@@ -42,22 +42,41 @@ class Satisfy extends Parser<StringReader, int> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<int> onDone) {
+  AsyncResult<int> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<int>();
     if (!backtrack(state)) {
-      onDone(null);
-      return;
+      result.ok = false;
+      return result;
     }
 
     final input = state.input;
     final start = input.start;
     input.buffering++;
+
+    final data = input.data;
+    final end = input.end;
+    int? c;
+    if (state.pos < end) {
+      input.buffering--;
+      final source = data.source!;
+      c = source.runeAt(state.pos - start);
+      if (result.ok = f(c)) {
+        state.pos += c > 0xffff ? 2 : 1;
+        result.value = Result(c);
+      } else {
+        state.fail<Object?>(ErrorUnexpectedCharacter(c));
+      }
+
+      input.handler = result.handler;
+      return result;
+    }
+
     void parse() {
       final data = input.data;
       final end = input.end;
       if (state.pos >= end && !input.isClosed) {
         input.sleep = true;
-        input.handle(parse);
+        input.handler = parse;
         return;
       }
 
@@ -68,15 +87,19 @@ class Satisfy extends Parser<StringReader, int> {
         c = source.runeAt(state.pos - start);
         if (f(c)) {
           state.pos += c > 0xffff ? 2 : 1;
-          onDone(Result(c));
+          result.value = Result(c);
+          result.ok = true;
+          input.handler = result.handler;
           return;
         }
       }
 
+      result.ok = false;
       state.fail<Object?>(ErrorUnexpectedCharacter(c));
-      onDone(null);
+      input.handler = result.handler;
     }
 
     parse();
+    return result;
   }
 }

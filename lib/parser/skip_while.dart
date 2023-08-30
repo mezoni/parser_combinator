@@ -43,16 +43,40 @@ class SkipWhile extends Parser<StringReader, String> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     if (!backtrack(state)) {
-      onDone(null);
-      return;
+      result.ok = false;
+      return result;
     }
 
     final input = state.input;
     final start = input.start;
     input.buffering++;
+
+    final data = input.data;
+    final source = data.source!;
+    final end = input.end;
+    var ok = true;
+    int? c;
+    while (state.pos < end) {
+      c = source.runeAt(state.pos - start);
+      if (!f(c)) {
+        ok = false;
+        break;
+      }
+
+      state.pos += c > 0xffff ? 2 : 1;
+    }
+
+    if (!ok) {
+      input.buffering--;
+      result.value = const Result('');
+      result.ok = true;
+      input.handler = result.handler;
+      return result;
+    }
+
     void parse() {
       final data = input.data;
       final source = data.source!;
@@ -71,14 +95,17 @@ class SkipWhile extends Parser<StringReader, String> {
 
       if (ok && !input.isClosed) {
         input.sleep = true;
-        input.handle(parse);
+        input.handler = parse;
         return;
       }
 
       input.buffering--;
-      onDone(const Result(''));
+      result.value = const Result('');
+      result.ok = true;
+      input.handler = result.handler;
     }
 
     parse();
+    return result;
   }
 }

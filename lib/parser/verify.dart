@@ -48,27 +48,48 @@ class Verify<I, O> extends Parser<I, O> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O> onDone) {
+  AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O>();
     final pos = state.pos;
+    late AsyncResult<O> r1;
+    var action = 0;
     void parse() {
-      p.parseAsync(state, (result) {
-        if (result == null) {
-          onDone(null);
-        } else {
-          final value = result.value;
-          final v = f(value);
-          if (v) {
-            onDone(Result(value));
-          } else {
-            final error = h(pos, state.pos, value);
-            state.pos = pos;
-            state.failAt<Object?>(pos, error);
-            onDone(null);
-          }
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            var ok = false;
+            if (r1.ok == true) {
+              final v1 = r1.value!;
+              final v2 = v1.value;
+              final v3 = f(v2);
+              if (v3) {
+                ok = true;
+                result.value = v1;
+              } else {
+                state.pos = pos;
+              }
+            }
+
+            result.ok = ok;
+            state.input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }

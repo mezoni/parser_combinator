@@ -44,17 +44,43 @@ class Digit extends Parser<StringReader, String> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     if (!backtrack(state)) {
-      onDone(null);
-      return;
+      result.ok = false;
+      return result;
     }
 
     final input = state.input;
     final start = input.start;
     final pos = state.pos;
     input.buffering++;
+
+    final data = input.data;
+    final source = data.source!;
+    final end = input.end;
+    var ok = true;
+    int? c;
+    while (state.pos < end) {
+      c = source.runeAt(state.pos - start);
+      if (!(c >= 0x30 && c <= 0x39)) {
+        ok = false;
+        break;
+      }
+
+      state.pos += c > 0xffff ? 2 : 1;
+    }
+
+    if (!ok) {
+      input.buffering--;
+      result.value = state.pos != pos
+          ? Result(source.substring(pos - start, state.pos - start))
+          : const Result('');
+      result.ok = true;
+      input.handler = result.handler;
+      return result;
+    }
+
     void parse() {
       final data = input.data;
       final source = data.source!;
@@ -68,23 +94,24 @@ class Digit extends Parser<StringReader, String> {
           break;
         }
 
-        state.pos++;
+        state.pos += c > 0xffff ? 2 : 1;
       }
 
       if (ok && !input.isClosed) {
         input.sleep = true;
-        input.handle(parse);
+        input.handler = parse;
         return;
       }
 
       input.buffering--;
-      if (state.pos != pos) {
-        onDone(Result(source.substring(pos - start, state.pos - start)));
-      } else {
-        onDone(const Result(''));
-      }
+      result.value = state.pos != pos
+          ? Result(source.substring(pos - start, state.pos - start))
+          : const Result('');
+      result.ok = true;
+      input.handler = result.handler;
     }
 
     parse();
+    return result;
   }
 }

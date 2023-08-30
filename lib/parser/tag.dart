@@ -38,38 +38,54 @@ class Tag extends Parser<StringReader, String> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     if (!backtrack(state)) {
-      onDone(null);
-      return;
+      result.ok = false;
+      return result;
     }
 
     final input = state.input;
     input.buffering++;
+
+    final data = input.data;
+    final source = data.source!;
+    final end = input.end;
+    if (state.pos + tag.length <= end) {
+      input.buffering--;
+      if (result.ok = source.startsWith(tag, state.pos - input.start)) {
+        state.pos += tag.length;
+        result.value = Result(tag);
+      } else {
+        state.fail<Object?>(ErrorExpectedTag(tag));
+      }
+
+      input.handler = result.handler;
+      return result;
+    }
+
     void parse() {
       final end = input.end;
       while (state.pos + tag.length > end && !input.isClosed) {
         input.sleep = true;
-        input.handle(parse);
+        input.handler = parse;
         return;
       }
 
+      input.buffering--;
       final data = input.data;
       final source = data.source!;
-      if (source.startsWith(tag, state.pos - input.start)) {
+      if (result.ok = source.startsWith(tag, state.pos - input.start)) {
         state.pos += tag.length;
-        input.buffering--;
-        onDone(Result(tag));
-        return;
+        result.value = Result(tag);
+      } else {
+        state.fail<Object?>(ErrorExpectedTag(tag));
       }
 
-      state.fail<Object?>(ErrorExpectedTag(tag));
-      input.buffering--;
-      onDone(null);
-      return;
+      input.handler = result.handler;
     }
 
     parse();
+    return result;
   }
 }

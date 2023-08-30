@@ -50,15 +50,15 @@ class Tags extends Parser<StringReader, String> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
     if (tags.isEmpty) {
       throw ArgumentError.value(tags, 'tags', 'Must not be empty');
     }
 
+    final result = AsyncResult<String>();
     if (!backtrack(state)) {
-      onDone(null);
-      return;
+      result.ok = false;
+      return result;
     }
 
     final input = state.input;
@@ -73,23 +73,28 @@ class Tags extends Parser<StringReader, String> {
         final tag = tags[index];
         if (state.pos + tag.length > end && !input.isClosed) {
           input.sleep = true;
-          input.handle(parse);
+          input.handler = parse;
           return;
         }
 
         if (source.startsWith(tag, state.pos - start)) {
           state.pos += tag.length;
           input.buffering--;
-          onDone(Result(tag));
+          result.value = Result(tag);
+          result.ok = true;
+          input.handler = result.handler;
           return;
         }
       }
 
       state.fail<Object?>(ErrorExpectedTags(tags));
       input.buffering--;
-      onDone(null);
+      result.ok = false;
+      input.handler = result.handler;
+      return;
     }
 
     parse();
+    return result;
   }
 }

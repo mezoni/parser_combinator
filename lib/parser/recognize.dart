@@ -31,37 +31,43 @@ class Recognize<O> extends Parser<StringReader, String> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
-    if (!backtrack(state)) {
-      onDone(null);
-      return;
-    }
-
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     final input = state.input;
-    final start = input.start;
     final pos = state.pos;
-    input.buffering++;
+    late AsyncResult<O> r1;
+    var action = 0;
     void parse() {
-      p.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.buffering--;
-          final data = input.data;
-          final source = data.source!;
-          if (state.pos != pos) {
-            onDone(Result(source.substring(pos - start, state.pos - start)));
-          } else {
-            onDone(const Result(''));
-          }
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if ((result.ok = r1.ok) == false) {
+              state.pos = pos;
+            } else {
+              result.value =
+                  Result(input.data.source!.substring(pos, state.pos));
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -110,48 +116,59 @@ class Recognize2<O1, O2> extends Parser<StringReader, String> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
-    if (!backtrack(state)) {
-      onDone(null);
-      return;
-    }
-
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     final input = state.input;
-    final start = input.start;
     final pos = state.pos;
-    input.buffering++;
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.buffering--;
-          final data = input.data;
-          final source = data.source!;
-          if (state.pos != pos) {
-            onDone(Result(source.substring(pos - start, state.pos - start)));
-          } else {
-            onDone(const Result(''));
-          }
-        }
-      });
-    }
-
+    late AsyncResult<O1> r1;
+    late AsyncResult<O2> r2;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          onDone(null);
-        } else {
-          input.handle(parse2);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == false) {
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r2 = p2.parseAsync(state);
+            action = 2;
+            if (r2.ok == null) {
+              r2.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if ((result.ok = r2.ok) == false) {
+              state.pos = pos;
+            } else {
+              result.value =
+                  Result(input.data.source!.substring(pos, state.pos));
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -209,60 +226,76 @@ class Recognize3<O1, O2, O3> extends Parser<StringReader, String> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
-    if (!backtrack(state)) {
-      onDone(null);
-      return;
-    }
-
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     final input = state.input;
-    final start = input.start;
     final pos = state.pos;
-    input.buffering++;
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.buffering--;
-          final data = input.data;
-          final source = data.source!;
-          if (state.pos != pos) {
-            onDone(Result(source.substring(pos - start, state.pos - start)));
-          } else {
-            onDone(const Result(''));
-          }
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse3);
-        }
-      });
-    }
-
+    late AsyncResult<O1> r1;
+    late AsyncResult<O2> r2;
+    late AsyncResult<O3> r3;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          onDone(null);
-        } else {
-          input.handle(parse2);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == false) {
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r2 = p2.parseAsync(state);
+            action = 2;
+            if (r2.ok == null) {
+              r2.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r2.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r3 = p3.parseAsync(state);
+            action = 3;
+            if (r3.ok == null) {
+              r3.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if ((result.ok = r3.ok) == false) {
+              state.pos = pos;
+            } else {
+              result.value =
+                  Result(input.data.source!.substring(pos, state.pos));
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -333,72 +366,93 @@ class Recognize4<O1, O2, O3, O4> extends Parser<StringReader, String> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
-    if (!backtrack(state)) {
-      onDone(null);
-      return;
-    }
-
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     final input = state.input;
-    final start = input.start;
     final pos = state.pos;
-    input.buffering++;
-    void parse4() {
-      p4.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.buffering--;
-          final data = input.data;
-          final source = data.source!;
-          if (state.pos != pos) {
-            onDone(Result(source.substring(pos - start, state.pos - start)));
-          } else {
-            onDone(const Result(''));
-          }
-        }
-      });
-    }
-
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse4);
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse3);
-        }
-      });
-    }
-
+    late AsyncResult<O1> r1;
+    late AsyncResult<O2> r2;
+    late AsyncResult<O3> r3;
+    late AsyncResult<O4> r4;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          onDone(null);
-        } else {
-          input.handle(parse2);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == false) {
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r2 = p2.parseAsync(state);
+            action = 2;
+            if (r2.ok == null) {
+              r2.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r2.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r3 = p3.parseAsync(state);
+            action = 3;
+            if (r3.ok == null) {
+              r3.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if (r3.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r4 = p4.parseAsync(state);
+            action = 4;
+            if (r4.ok == null) {
+              r4.handler = parse;
+              return;
+            }
+
+            break;
+          case 4:
+            if ((result.ok = r4.ok) == false) {
+              state.pos = pos;
+            } else {
+              result.value =
+                  Result(input.data.source!.substring(pos, state.pos));
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -478,84 +532,110 @@ class Recognize5<O1, O2, O3, O4, O5> extends Parser<StringReader, String> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
-    if (!backtrack(state)) {
-      onDone(null);
-      return;
-    }
-
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     final input = state.input;
-    final start = input.start;
     final pos = state.pos;
-    input.buffering++;
-    void parse5() {
-      p5.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.buffering--;
-          final data = input.data;
-          final source = data.source!;
-          if (state.pos != pos) {
-            onDone(Result(source.substring(pos - start, state.pos - start)));
-          } else {
-            onDone(const Result(''));
-          }
-        }
-      });
-    }
-
-    void parse4() {
-      p4.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse5);
-        }
-      });
-    }
-
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse4);
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse3);
-        }
-      });
-    }
-
+    late AsyncResult<O1> r1;
+    late AsyncResult<O2> r2;
+    late AsyncResult<O3> r3;
+    late AsyncResult<O4> r4;
+    late AsyncResult<O5> r5;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          onDone(null);
-        } else {
-          input.handle(parse2);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == false) {
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r2 = p2.parseAsync(state);
+            action = 2;
+            if (r2.ok == null) {
+              r2.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r2.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r3 = p3.parseAsync(state);
+            action = 3;
+            if (r3.ok == null) {
+              r3.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if (r3.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r4 = p4.parseAsync(state);
+            action = 4;
+            if (r4.ok == null) {
+              r4.handler = parse;
+              return;
+            }
+
+            break;
+          case 4:
+            if (r4.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r5 = p5.parseAsync(state);
+            action = 5;
+            if (r5.ok == null) {
+              r5.handler = parse;
+              return;
+            }
+
+            break;
+          case 5:
+            if ((result.ok = r5.ok) == false) {
+              state.pos = pos;
+            } else {
+              result.value =
+                  Result(input.data.source!.substring(pos, state.pos));
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -645,96 +725,127 @@ class Recognize6<O1, O2, O3, O4, O5, O6> extends Parser<StringReader, String> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
-    if (!backtrack(state)) {
-      onDone(null);
-      return;
-    }
-
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     final input = state.input;
-    final start = input.start;
     final pos = state.pos;
-    input.buffering++;
-    void parse6() {
-      p6.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.buffering--;
-          final data = input.data;
-          final source = data.source!;
-          if (state.pos != pos) {
-            onDone(Result(source.substring(pos - start, state.pos - start)));
-          } else {
-            onDone(const Result(''));
-          }
-        }
-      });
-    }
-
-    void parse5() {
-      p5.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse6);
-        }
-      });
-    }
-
-    void parse4() {
-      p4.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse5);
-        }
-      });
-    }
-
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse4);
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse3);
-        }
-      });
-    }
-
+    late AsyncResult<O1> r1;
+    late AsyncResult<O2> r2;
+    late AsyncResult<O3> r3;
+    late AsyncResult<O4> r4;
+    late AsyncResult<O5> r5;
+    late AsyncResult<O6> r6;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          onDone(null);
-        } else {
-          input.handle(parse2);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == false) {
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r2 = p2.parseAsync(state);
+            action = 2;
+            if (r2.ok == null) {
+              r2.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r2.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r3 = p3.parseAsync(state);
+            action = 3;
+            if (r3.ok == null) {
+              r3.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if (r3.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r4 = p4.parseAsync(state);
+            action = 4;
+            if (r4.ok == null) {
+              r4.handler = parse;
+              return;
+            }
+
+            break;
+          case 4:
+            if (r4.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r5 = p5.parseAsync(state);
+            action = 5;
+            if (r5.ok == null) {
+              r5.handler = parse;
+              return;
+            }
+
+            break;
+          case 5:
+            if (r5.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r6 = p6.parseAsync(state);
+            action = 6;
+            if (r6.ok == null) {
+              r6.handler = parse;
+              return;
+            }
+
+            break;
+          case 6:
+            if ((result.ok = r6.ok) == false) {
+              state.pos = pos;
+            } else {
+              result.value =
+                  Result(input.data.source!.substring(pos, state.pos));
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -835,108 +946,144 @@ class Recognize7<O1, O2, O3, O4, O5, O6, O7>
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
-    if (!backtrack(state)) {
-      onDone(null);
-      return;
-    }
-
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     final input = state.input;
-    final start = input.start;
     final pos = state.pos;
-    input.buffering++;
-    void parse7() {
-      p7.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.buffering--;
-          final data = input.data;
-          final source = data.source!;
-          if (state.pos != pos) {
-            onDone(Result(source.substring(pos - start, state.pos - start)));
-          } else {
-            onDone(const Result(''));
-          }
-        }
-      });
-    }
-
-    void parse6() {
-      p6.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse7);
-        }
-      });
-    }
-
-    void parse5() {
-      p5.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse6);
-        }
-      });
-    }
-
-    void parse4() {
-      p4.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse5);
-        }
-      });
-    }
-
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse4);
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse3);
-        }
-      });
-    }
-
+    late AsyncResult<O1> r1;
+    late AsyncResult<O2> r2;
+    late AsyncResult<O3> r3;
+    late AsyncResult<O4> r4;
+    late AsyncResult<O5> r5;
+    late AsyncResult<O6> r6;
+    late AsyncResult<O7> r7;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          onDone(null);
-        } else {
-          input.handle(parse2);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == false) {
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r2 = p2.parseAsync(state);
+            action = 2;
+            if (r2.ok == null) {
+              r2.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r2.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r3 = p3.parseAsync(state);
+            action = 3;
+            if (r3.ok == null) {
+              r3.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if (r3.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r4 = p4.parseAsync(state);
+            action = 4;
+            if (r4.ok == null) {
+              r4.handler = parse;
+              return;
+            }
+
+            break;
+          case 4:
+            if (r4.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r5 = p5.parseAsync(state);
+            action = 5;
+            if (r5.ok == null) {
+              r5.handler = parse;
+              return;
+            }
+
+            break;
+          case 5:
+            if (r5.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r6 = p6.parseAsync(state);
+            action = 6;
+            if (r6.ok == null) {
+              r6.handler = parse;
+              return;
+            }
+
+            break;
+          case 6:
+            if (r6.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r7 = p7.parseAsync(state);
+            action = 7;
+            if (r7.ok == null) {
+              r7.handler = parse;
+              return;
+            }
+
+            break;
+          case 7:
+            if ((result.ok = r7.ok) == false) {
+              state.pos = pos;
+            } else {
+              result.value =
+                  Result(input.data.source!.substring(pos, state.pos));
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -1046,120 +1193,161 @@ class Recognize8<O1, O2, O3, O4, O5, O6, O7, O8>
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
-    if (!backtrack(state)) {
-      onDone(null);
-      return;
-    }
-
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     final input = state.input;
-    final start = input.start;
     final pos = state.pos;
-    input.buffering++;
-    void parse8() {
-      p8.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.buffering--;
-          final data = input.data;
-          final source = data.source!;
-          if (state.pos != pos) {
-            onDone(Result(source.substring(pos - start, state.pos - start)));
-          } else {
-            onDone(const Result(''));
-          }
-        }
-      });
-    }
-
-    void parse7() {
-      p7.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse8);
-        }
-      });
-    }
-
-    void parse6() {
-      p6.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse7);
-        }
-      });
-    }
-
-    void parse5() {
-      p5.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse6);
-        }
-      });
-    }
-
-    void parse4() {
-      p4.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse5);
-        }
-      });
-    }
-
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse4);
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse3);
-        }
-      });
-    }
-
+    late AsyncResult<O1> r1;
+    late AsyncResult<O2> r2;
+    late AsyncResult<O3> r3;
+    late AsyncResult<O4> r4;
+    late AsyncResult<O5> r5;
+    late AsyncResult<O6> r6;
+    late AsyncResult<O7> r7;
+    late AsyncResult<O8> r8;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          onDone(null);
-        } else {
-          input.handle(parse2);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == false) {
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r2 = p2.parseAsync(state);
+            action = 2;
+            if (r2.ok == null) {
+              r2.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r2.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r3 = p3.parseAsync(state);
+            action = 3;
+            if (r3.ok == null) {
+              r3.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if (r3.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r4 = p4.parseAsync(state);
+            action = 4;
+            if (r4.ok == null) {
+              r4.handler = parse;
+              return;
+            }
+
+            break;
+          case 4:
+            if (r4.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r5 = p5.parseAsync(state);
+            action = 5;
+            if (r5.ok == null) {
+              r5.handler = parse;
+              return;
+            }
+
+            break;
+          case 5:
+            if (r5.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r6 = p6.parseAsync(state);
+            action = 6;
+            if (r6.ok == null) {
+              r6.handler = parse;
+              return;
+            }
+
+            break;
+          case 6:
+            if (r6.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r7 = p7.parseAsync(state);
+            action = 7;
+            if (r7.ok == null) {
+              r7.handler = parse;
+              return;
+            }
+
+            break;
+          case 7:
+            if (r7.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r8 = p8.parseAsync(state);
+            action = 8;
+            if (r8.ok == null) {
+              r8.handler = parse;
+              return;
+            }
+
+            break;
+          case 8:
+            if ((result.ok = r8.ok) == false) {
+              state.pos = pos;
+            } else {
+              result.value =
+                  Result(input.data.source!.substring(pos, state.pos));
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
 
@@ -1278,131 +1466,177 @@ class Recognize9<O1, O2, O3, O4, O5, O6, O7, O8, O9>
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
-    if (!backtrack(state)) {
-      onDone(null);
-      return;
-    }
-
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     final input = state.input;
-    final start = input.start;
     final pos = state.pos;
-    input.buffering++;
-    void parse9() {
-      p9.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.buffering--;
-          final data = input.data;
-          final source = data.source!;
-          if (state.pos != pos) {
-            onDone(Result(source.substring(pos - start, state.pos - start)));
-          } else {
-            onDone(const Result(''));
-          }
-        }
-      });
-    }
-
-    void parse8() {
-      p8.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse9);
-        }
-      });
-    }
-
-    void parse7() {
-      p7.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse8);
-        }
-      });
-    }
-
-    void parse6() {
-      p6.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse7);
-        }
-      });
-    }
-
-    void parse5() {
-      p5.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse6);
-        }
-      });
-    }
-
-    void parse4() {
-      p4.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse5);
-        }
-      });
-    }
-
-    void parse3() {
-      p3.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse4);
-        }
-      });
-    }
-
-    void parse2() {
-      p2.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          state.pos = pos;
-          onDone(null);
-        } else {
-          input.handle(parse3);
-        }
-      });
-    }
-
+    late AsyncResult<O1> r1;
+    late AsyncResult<O2> r2;
+    late AsyncResult<O3> r3;
+    late AsyncResult<O4> r4;
+    late AsyncResult<O5> r5;
+    late AsyncResult<O6> r6;
+    late AsyncResult<O7> r7;
+    late AsyncResult<O8> r8;
+    late AsyncResult<O9> r9;
+    var action = 0;
     void parse() {
-      p1.parseAsync(state, (result) {
-        if (result == null) {
-          input.buffering--;
-          onDone(null);
-        } else {
-          input.handle(parse2);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p1.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == false) {
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r2 = p2.parseAsync(state);
+            action = 2;
+            if (r2.ok == null) {
+              r2.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if (r2.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r3 = p3.parseAsync(state);
+            action = 3;
+            if (r3.ok == null) {
+              r3.handler = parse;
+              return;
+            }
+
+            break;
+          case 3:
+            if (r3.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r4 = p4.parseAsync(state);
+            action = 4;
+            if (r4.ok == null) {
+              r4.handler = parse;
+              return;
+            }
+
+            break;
+          case 4:
+            if (r4.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r5 = p5.parseAsync(state);
+            action = 5;
+            if (r5.ok == null) {
+              r5.handler = parse;
+              return;
+            }
+
+            break;
+          case 5:
+            if (r5.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r6 = p6.parseAsync(state);
+            action = 6;
+            if (r6.ok == null) {
+              r6.handler = parse;
+              return;
+            }
+
+            break;
+          case 6:
+            if (r6.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r7 = p7.parseAsync(state);
+            action = 7;
+            if (r7.ok == null) {
+              r7.handler = parse;
+              return;
+            }
+
+            break;
+          case 7:
+            if (r7.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r8 = p8.parseAsync(state);
+            action = 8;
+            if (r8.ok == null) {
+              r8.handler = parse;
+              return;
+            }
+
+            break;
+          case 8:
+            if (r8.ok == false) {
+              state.pos = pos;
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r9 = p9.parseAsync(state);
+            action = 9;
+            if (r9.ok == null) {
+              r9.handler = parse;
+              return;
+            }
+
+            break;
+          case 9:
+            if ((result.ok = r9.ok) == false) {
+              state.pos = pos;
+            } else {
+              result.value =
+                  Result(input.data.source!.substring(pos, state.pos));
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }

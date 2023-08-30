@@ -52,11 +52,11 @@ class TakeWhile1 extends Parser<StringReader, String> {
   }
 
   @override
-  void parseAsync(
-      State<ChunkedData<StringReader>> state, ResultCallback<String> onDone) {
+  AsyncResult<String> parseAsync(State<ChunkedData<StringReader>> state) {
+    final result = AsyncResult<String>();
     if (!backtrack(state)) {
-      onDone(null);
-      return;
+      result.ok = false;
+      return result;
     }
 
     final input = state.input;
@@ -81,20 +81,21 @@ class TakeWhile1 extends Parser<StringReader, String> {
 
       if (ok && !input.isClosed) {
         input.sleep = true;
-        input.handle(parse);
+        input.handler = parse;
         return;
       }
 
       input.buffering--;
-      if (state.pos != pos) {
-        onDone(Result(source.substring(pos - start, state.pos - start)));
+      if (result.ok = state.pos != pos) {
+        result.value = Result(source.substring(pos - start, state.pos - start));
       } else {
         state.fail<Object?>(ErrorUnexpectedCharacter(c));
-        state.pos = pos;
-        onDone(null);
       }
+
+      input.handler = result.handler;
     }
 
     parse();
+    return result;
   }
 }

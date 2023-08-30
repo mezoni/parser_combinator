@@ -21,12 +21,15 @@ class Proc<I> extends Parser<I, Object?> {
   @override
   Result<Object?>? parse(State<I> state) {
     f();
-    return const Result(null);
+    return const Result<Object?>(null);
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<Object?> onDone) {
+  AsyncResult<Object?> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<Object?>();
     f();
-    onDone(Result(null));
+    result.value = const Result<Object?>(null);
+    result.ok = true;
+    return result;
   }
 }

@@ -1,7 +1,7 @@
 import 'runtime.dart';
 
 abstract class ChunkedData<T> implements Sink<T> {
-  void Function()? _handler;
+  void Function()? handler;
 
   bool _isClosed = false;
 
@@ -39,8 +39,8 @@ abstract class ChunkedData<T> implements Sink<T> {
     end = start + getLength(this.data);
     sleep = false;
     while (!sleep) {
-      final h = _handler;
-      _handler = null;
+      final h = handler;
+      handler = null;
       if (h == null) {
         break;
       }
@@ -62,8 +62,8 @@ abstract class ChunkedData<T> implements Sink<T> {
     _isClosed = true;
     sleep = false;
     while (!sleep) {
-      final h = _handler;
-      _handler = null;
+      final h = handler;
+      handler = null;
       if (h == null) {
         break;
       }
@@ -82,14 +82,6 @@ abstract class ChunkedData<T> implements Sink<T> {
   }
 
   int getLength(T data);
-
-  void handle(void Function()? handler) {
-    if (_handler != null && handler != null) {
-      throw StateError('Handler already specified');
-    }
-
-    _handler = handler;
-  }
 
   T join(T data1, T data2);
 }

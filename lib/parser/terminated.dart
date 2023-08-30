@@ -47,32 +47,57 @@ class Terminated<I, O1, O2> extends Parser<I, O1> {
   }
 
   @override
-  void parseAsync(State<ChunkedData<I>> state, ResultCallback<O1> onDone) {
+  AsyncResult<O1> parseAsync(State<ChunkedData<I>> state) {
+    final result = AsyncResult<O1>();
     final input = state.input;
     final pos = state.pos;
-    Result<O1>? r1;
-    void parse2() {
-      end.parseAsync(state, (result) {
-        if (result == null) {
-          state.pos = pos;
-          onDone(null);
-        } else {
-          onDone(r1);
-        }
-      });
-    }
-
+    late AsyncResult<O1> r1;
+    late AsyncResult<O2> r2;
+    var action = 0;
     void parse() {
-      p.parseAsync(state, (result) {
-        if (result == null) {
-          onDone(null);
-        } else {
-          r1 = result;
-          input.handle(parse2);
+      while (true) {
+        switch (action) {
+          case 0:
+            r1 = p.parseAsync(state);
+            action = 1;
+            if (r1.ok == null) {
+              r1.handler = parse;
+              return;
+            }
+
+            break;
+          case 1:
+            if (r1.ok == false) {
+              result.ok = false;
+              input.handler = result.handler;
+              return;
+            }
+
+            r2 = end.parseAsync(state);
+            action = 2;
+            if (r2.ok == null) {
+              r2.handler = parse;
+              return;
+            }
+
+            break;
+          case 2:
+            if ((result.ok = r2.ok) == false) {
+              state.pos = pos;
+            } else {
+              result.value = r1.value;
+            }
+
+            input.handler = result.handler;
+            action = -1;
+            return;
+          default:
+            throw StateError('Invalid state: $action');
         }
-      });
+      }
     }
 
     parse();
+    return result;
   }
 }
