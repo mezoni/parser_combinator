@@ -1,6 +1,6 @@
 ## 0.2.9
 
-- Added first documentation.
+- Added documentation of how some parsers work.
 
 ## 0.2.8
 
