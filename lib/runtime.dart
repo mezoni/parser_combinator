@@ -136,7 +136,7 @@ class ErrorUnexpectedCharacter extends ParseError {
   ErrorMessage getErrorMessage(Object? input, int? offset) {
     var argument = '<?>';
     var char = this.char;
-    if (input is StringReader && input.source != null) {
+    if (input is StringReader && input.hasSource) {
       if (offset case final int offset) {
         if (offset < input.length) {
           char = input.readChar(offset);
@@ -352,8 +352,8 @@ class State<T> {
   @override
   String toString() {
     final input = this.input;
-    if (input is StringReader && input.source != null) {
-      final source = input.source!;
+    if (input is StringReader && input.hasSource) {
+      final source = input.source;
       if (pos >= source.length) {
         return '$pos:';
       }

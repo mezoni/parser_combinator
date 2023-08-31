@@ -2,6 +2,12 @@ import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
 
+/// Applies a predicate `[0-9]` to each parsed character and consumes input
+/// until the predicate returns true.
+///
+/// Parsing always succeeds.
+///
+/// Returns: A string consisting of the consumed characters.
 class Digit extends Parser<StringReader, String> {
   const Digit({String? name}) : super(name);
 
@@ -57,7 +63,7 @@ class Digit extends Parser<StringReader, String> {
     input.buffering++;
 
     final data = input.data;
-    final source = data.source!;
+    final source = data.source;
     final end = input.end;
     var ok = true;
     int? c;
@@ -83,7 +89,7 @@ class Digit extends Parser<StringReader, String> {
 
     void parse() {
       final data = input.data;
-      final source = data.source!;
+      final source = data.source;
       final end = input.end;
       var ok = true;
       int? c;

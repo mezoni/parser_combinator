@@ -2,6 +2,14 @@ import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
 
+/// Applies a predicate [f] to parsed character and consumes input if the
+/// predicate returns true.
+///
+/// Parsing succeeds if the character has been consumed.
+///
+/// Otherwise, parsing fails with the error [ErrorUnexpectedCharacter].
+///
+/// Returns: Consumed character.
 class Satisfy extends Parser<StringReader, int> {
   final Predicate<int> f;
 
@@ -58,7 +66,7 @@ class Satisfy extends Parser<StringReader, int> {
     int? c;
     if (state.pos < end) {
       input.buffering--;
-      final source = data.source!;
+      final source = data.source;
       c = source.runeAt(state.pos - start);
       if (result.ok = f(c)) {
         state.pos += c > 0xffff ? 2 : 1;
@@ -83,7 +91,7 @@ class Satisfy extends Parser<StringReader, int> {
       input.buffering--;
       int? c;
       if (state.pos < end) {
-        final source = data.source!;
+        final source = data.source;
         c = source.runeAt(state.pos - start);
         if (f(c)) {
           state.pos += c > 0xffff ? 2 : 1;

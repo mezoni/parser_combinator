@@ -1,6 +1,14 @@
 import '../parser_combinator.dart';
 import '../runtime.dart';
 
+/// Cyclically invokes the [p] parser and stores each parse result in a list
+/// until the [p] parser fails, at least [m] and no more than [n] results.
+///
+/// Parsing succeeds if enough results are available (>= m && <= n).
+///
+/// Otherwise, parsing fails.
+///
+/// Returns: List of parsing results.
 class ManyMN<I, O> extends Parser<I, List<O>> {
   final int m;
 

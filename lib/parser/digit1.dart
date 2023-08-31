@@ -2,6 +2,14 @@ import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
 
+/// Applies a predicate `[0-9]` to each parsed character and consumes input
+/// until the predicate returns true.
+///
+/// Parsing succeeds if at least one character has been consumed.
+///
+/// Otherwise, parsing fails with the error [ErrorUnexpectedCharacter].
+///
+/// Returns: A string consisting of the consumed characters.
 class Digit1 extends Parser<StringReader, String> {
   const Digit1({String? name}) : super(name);
 
@@ -63,7 +71,7 @@ class Digit1 extends Parser<StringReader, String> {
     input.buffering++;
     void parse() {
       final data = input.data;
-      final source = data.source!;
+      final source = data.source;
       final end = input.end;
       var ok = true;
       int? c;

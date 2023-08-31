@@ -2,6 +2,14 @@ import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
 
+/// Stores the current parsing position and invokes invokes the [p] parser.
+///
+/// Parsing succeeds if parsing by the [p] parser succeeds.
+///
+/// Otherwise, parsing fails.
+///
+/// Returns: Input string value from the stored position to the last parsed
+/// position.
 class Recognize<O> extends Parser<StringReader, String> {
   final Parser<StringReader, O> p;
 
@@ -54,7 +62,7 @@ class Recognize<O> extends Parser<StringReader, String> {
               state.pos = pos;
             } else {
               result.value =
-                  Result(input.data.source!.substring(pos, state.pos));
+                  Result(input.data.source.substring(pos, state.pos));
             }
 
             input.handler = result.handler;
@@ -71,6 +79,14 @@ class Recognize<O> extends Parser<StringReader, String> {
   }
 }
 
+/// Stores the current parsing position and invokes all specified parsers.
+///
+/// Parsing succeeds if the parsing of all parsers succeeds.
+///
+/// Otherwise, parsing fails.
+///
+/// Returns: Input string value from the stored position to the last parsed
+/// position.
 class Recognize2<O1, O2> extends Parser<StringReader, String> {
   final Parser<StringReader, O1> p1;
 
@@ -155,7 +171,7 @@ class Recognize2<O1, O2> extends Parser<StringReader, String> {
               state.pos = pos;
             } else {
               result.value =
-                  Result(input.data.source!.substring(pos, state.pos));
+                  Result(input.data.source.substring(pos, state.pos));
             }
 
             input.handler = result.handler;
@@ -172,6 +188,22 @@ class Recognize2<O1, O2> extends Parser<StringReader, String> {
   }
 }
 
+/// Stores the current parsing position and invokes all specified parsers.
+///
+/// Parsing succeeds if the parsing of all parsers succeeds.
+///
+/// Otherwise, parsing fails.
+///
+/// Returns: Input string value from the stored position to the last parsed
+/// position.
+/// Stores the current parsing position and invokes all specified parsers.
+///
+/// Parsing succeeds if the parsing of all parsers succeeds.
+///
+/// Otherwise, parsing fails.
+///
+/// Returns: Input string value from the stored position to the last parsed
+/// position.
 class Recognize3<O1, O2, O3> extends Parser<StringReader, String> {
   final Parser<StringReader, O1> p1;
 
@@ -282,7 +314,7 @@ class Recognize3<O1, O2, O3> extends Parser<StringReader, String> {
               state.pos = pos;
             } else {
               result.value =
-                  Result(input.data.source!.substring(pos, state.pos));
+                  Result(input.data.source.substring(pos, state.pos));
             }
 
             input.handler = result.handler;
@@ -299,6 +331,14 @@ class Recognize3<O1, O2, O3> extends Parser<StringReader, String> {
   }
 }
 
+/// Stores the current parsing position and invokes all specified parsers.
+///
+/// Parsing succeeds if the parsing of all parsers succeeds.
+///
+/// Otherwise, parsing fails.
+///
+/// Returns: Input string value from the stored position to the last parsed
+/// position.
 class Recognize4<O1, O2, O3, O4> extends Parser<StringReader, String> {
   final Parser<StringReader, O1> p1;
 
@@ -439,7 +479,7 @@ class Recognize4<O1, O2, O3, O4> extends Parser<StringReader, String> {
               state.pos = pos;
             } else {
               result.value =
-                  Result(input.data.source!.substring(pos, state.pos));
+                  Result(input.data.source.substring(pos, state.pos));
             }
 
             input.handler = result.handler;
@@ -456,6 +496,14 @@ class Recognize4<O1, O2, O3, O4> extends Parser<StringReader, String> {
   }
 }
 
+/// Stores the current parsing position and invokes all specified parsers.
+///
+/// Parsing succeeds if the parsing of all parsers succeeds.
+///
+/// Otherwise, parsing fails.
+///
+/// Returns: Input string value from the stored position to the last parsed
+/// position.
 class Recognize5<O1, O2, O3, O4, O5> extends Parser<StringReader, String> {
   final Parser<StringReader, O1> p1;
 
@@ -622,7 +670,7 @@ class Recognize5<O1, O2, O3, O4, O5> extends Parser<StringReader, String> {
               state.pos = pos;
             } else {
               result.value =
-                  Result(input.data.source!.substring(pos, state.pos));
+                  Result(input.data.source.substring(pos, state.pos));
             }
 
             input.handler = result.handler;
@@ -639,6 +687,14 @@ class Recognize5<O1, O2, O3, O4, O5> extends Parser<StringReader, String> {
   }
 }
 
+/// Stores the current parsing position and invokes all specified parsers.
+///
+/// Parsing succeeds if the parsing of all parsers succeeds.
+///
+/// Otherwise, parsing fails.
+///
+/// Returns: Input string value from the stored position to the last parsed
+/// position.
 class Recognize6<O1, O2, O3, O4, O5, O6> extends Parser<StringReader, String> {
   final Parser<StringReader, O1> p1;
 
@@ -832,7 +888,7 @@ class Recognize6<O1, O2, O3, O4, O5, O6> extends Parser<StringReader, String> {
               state.pos = pos;
             } else {
               result.value =
-                  Result(input.data.source!.substring(pos, state.pos));
+                  Result(input.data.source.substring(pos, state.pos));
             }
 
             input.handler = result.handler;
@@ -849,6 +905,14 @@ class Recognize6<O1, O2, O3, O4, O5, O6> extends Parser<StringReader, String> {
   }
 }
 
+/// Stores the current parsing position and invokes all specified parsers.
+///
+/// Parsing succeeds if the parsing of all parsers succeeds.
+///
+/// Otherwise, parsing fails.
+///
+/// Returns: Input string value from the stored position to the last parsed
+/// position.
 class Recognize7<O1, O2, O3, O4, O5, O6, O7>
     extends Parser<StringReader, String> {
   final Parser<StringReader, O1> p1;
@@ -1070,7 +1134,7 @@ class Recognize7<O1, O2, O3, O4, O5, O6, O7>
               state.pos = pos;
             } else {
               result.value =
-                  Result(input.data.source!.substring(pos, state.pos));
+                  Result(input.data.source.substring(pos, state.pos));
             }
 
             input.handler = result.handler;
@@ -1087,6 +1151,14 @@ class Recognize7<O1, O2, O3, O4, O5, O6, O7>
   }
 }
 
+/// Stores the current parsing position and invokes all specified parsers.
+///
+/// Parsing succeeds if the parsing of all parsers succeeds.
+///
+/// Otherwise, parsing fails.
+///
+/// Returns: Input string value from the stored position to the last parsed
+/// position.
 class Recognize8<O1, O2, O3, O4, O5, O6, O7, O8>
     extends Parser<StringReader, String> {
   final Parser<StringReader, O1> p1;
@@ -1334,7 +1406,7 @@ class Recognize8<O1, O2, O3, O4, O5, O6, O7, O8>
               state.pos = pos;
             } else {
               result.value =
-                  Result(input.data.source!.substring(pos, state.pos));
+                  Result(input.data.source.substring(pos, state.pos));
             }
 
             input.handler = result.handler;
@@ -1351,6 +1423,14 @@ class Recognize8<O1, O2, O3, O4, O5, O6, O7, O8>
   }
 }
 
+/// Stores the current parsing position and invokes all specified parsers.
+///
+/// Parsing succeeds if the parsing of all parsers succeeds.
+///
+/// Otherwise, parsing fails.
+///
+/// Returns: Input string value from the stored position to the last parsed
+/// position.
 class Recognize9<O1, O2, O3, O4, O5, O6, O7, O8, O9>
     extends Parser<StringReader, String> {
   final Parser<StringReader, O1> p1;
@@ -1624,7 +1704,7 @@ class Recognize9<O1, O2, O3, O4, O5, O6, O7, O8, O9>
               state.pos = pos;
             } else {
               result.value =
-                  Result(input.data.source!.substring(pos, state.pos));
+                  Result(input.data.source.substring(pos, state.pos));
             }
 
             input.handler = result.handler;

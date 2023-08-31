@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:parser_combinator/code_generator.dart';
 
 import 'package:parser_combinator/extra/csv_parser.dart' as csv;

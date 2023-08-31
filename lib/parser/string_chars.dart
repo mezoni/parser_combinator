@@ -2,6 +2,17 @@ import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
 
+/// Parses the internal parts of a string (all characters except quotes) in the
+/// following order:
+/// - Applies a predicate to parse the normal characters of the string
+/// - Checks (and consumes) if the next character is an escape control character
+/// - Invokes the escape sequence parser if a control character is consumed
+/// - Repeats everything from the beginning if at least one parse succeeded
+///
+/// At the end of the parsing the parts, combines everything into one string
+/// value and parsing completes successfully.
+///
+/// Returns the combined (from parts) string value.
 class StringChars extends Parser<StringReader, String> {
   final bool Function(int) isNormalChar;
 

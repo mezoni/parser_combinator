@@ -56,7 +56,7 @@ class AnyChar extends Parser<StringReader, int> {
       final data = input.data;
       input.buffering--;
       if (state.pos < end) {
-        final source = data.source!;
+        final source = data.source;
         final c = source.runeAt(state.pos - input.start);
         state.pos += c > 0xffff ? 2 : 1;
         result.value = Result(c);

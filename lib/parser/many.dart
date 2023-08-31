@@ -2,6 +2,12 @@ import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
 
+/// Cyclically invokes the [p] parser and stores each parse result in a list
+/// until the [p] parser fails.
+///
+/// Parsing always succeeds.
+///
+/// Returns: List of parsing results.
 class Many<I, O> extends Parser<I, List<O>> {
   final Parser<I, O> p;
 

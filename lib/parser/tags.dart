@@ -2,6 +2,7 @@ import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
 
+/// Recognizes a [tag] and returns this [tag].
 class Tags extends Parser<StringReader, String> {
   final List<String> tags;
 
@@ -67,7 +68,7 @@ class Tags extends Parser<StringReader, String> {
     input.buffering++;
     void parse() {
       final data = input.data;
-      final source = data.source!;
+      final source = data.source;
       final end = input.end;
       for (; index < tags.length; index++) {
         final tag = tags[index];

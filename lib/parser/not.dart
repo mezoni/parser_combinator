@@ -2,6 +2,14 @@ import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
 
+/// Stores the current parsing position, invokes the [p] parser and then
+/// restores the current parse position.
+///
+/// Parsing succeeds if parsing by the [p] parser fails.
+///
+/// Otherwise, parsing fails.
+///
+/// Returns: Value with type [Object]?.
 class Not<I, O> extends Parser<I, Object?> {
   final Parser<I, O> p;
 

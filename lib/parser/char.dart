@@ -68,7 +68,7 @@ class Char extends Parser<StringReader, int> {
       final data = input.data;
       input.buffering--;
       if (state.pos < end) {
-        final source = data.source!;
+        final source = data.source;
         final c = source.runeAt(state.pos - input.start);
         if (c == char) {
           state.pos += c > 0xffff ? 2 : 1;

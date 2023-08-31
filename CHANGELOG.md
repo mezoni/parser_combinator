@@ -1,3 +1,7 @@
+## 0.2.9
+
+- Added first documentation.
+
 ## 0.2.8
 
 - Minor changes in `Utf8Reader`.

@@ -30,8 +30,8 @@ ParseResult<I, R> createParseResult<I, O, R>(
   if (errorMessage != null) {
     message = errorMessage(input, offset, localized);
   } else if (input is StringReader) {
-    if (input.source != null) {
-      message = _errorMessage(input.source!, offset, localized);
+    if (input.hasSource) {
+      message = _errorMessage(input.source, offset, localized);
     } else {
       message = _errorMessage2(input, offset, localized);
     }

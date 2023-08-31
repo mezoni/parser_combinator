@@ -52,15 +52,20 @@ abstract class Parser<I, O> {
     return true;
   }
 
+  /// Builds a new parser using the specified [builder].
   Parser<I, O> build(ParserBuilder<I> builder);
 
+  /// Parses the input and returns `true` if successful, `false` otherwise.
   bool fastParse(State<I> state) {
     final result = parse(state);
     return result != null;
   }
 
+  /// Parses the input and returns a result wrapped in [Result] if successful,
+  /// `null` otherwise.
   Result<O>? parse(State<I> state);
 
+  /// Experimental. Not yet fully implemented
   AsyncResult<O> parseAsync(State<ChunkedData<I>> state) {
     throw UnimplementedError();
   }

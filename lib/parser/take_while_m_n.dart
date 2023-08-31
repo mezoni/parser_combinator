@@ -2,6 +2,14 @@ import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
 
+/// Applies a predicate [f] to each parsed character and consumes input if the
+/// predicate returns true, at least [m] and no more than [n] characters.
+///
+/// Parsing succeeds if enough characters have been consumed (>= m && <= n).
+///
+/// Otherwise, parsing fails with the error [ErrorUnexpectedCharacter].
+///
+/// Returns: A string consisting of the consumed characters.
 class TakeWhileMN extends Parser<StringReader, String> {
   final Predicate<int> f;
 

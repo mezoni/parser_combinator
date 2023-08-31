@@ -2,6 +2,14 @@ import '../parser_combinator.dart';
 import '../runtime.dart';
 import '../streaming.dart';
 
+/// Matches a sequence of characters from string [tag] and consumes this
+/// sequence.
+///
+/// Parsing succeeds if entire sequence of characters has been consumed.
+///
+/// Otherwise, parsing fails with the error [ErrorExpectedTag].
+///
+/// Returns: The string value of the tag [tag].
 class Tag extends Parser<StringReader, String> {
   final String tag;
 
@@ -49,7 +57,7 @@ class Tag extends Parser<StringReader, String> {
     input.buffering++;
 
     final data = input.data;
-    final source = data.source!;
+    final source = data.source;
     final end = input.end;
     if (state.pos + tag.length <= end) {
       input.buffering--;
@@ -74,7 +82,7 @@ class Tag extends Parser<StringReader, String> {
 
       input.buffering--;
       final data = input.data;
-      final source = data.source!;
+      final source = data.source;
       if (result.ok = source.startsWith(tag, state.pos - input.start)) {
         state.pos += tag.length;
         result.value = Result(tag);
